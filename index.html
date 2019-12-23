@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Server Info</title>
+        <script src="https://unpkg.com/vue"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    </head>
+
+    <body>
+        <div id="app">
+            <h1>{{ message }}</h1>
+
+            <input type="text" v-model="url">
+            <button >Get Information</button>
+            
+            <!-- prueba -->
+            <h3>{{ url }}</h3>
+        </div>
+
+        <!-- development version, includes helpful console warnings -->
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+        <!-- using index.js with "app" definition -->
+        <script src="index.js"></script>
+    </body>
+</html>
