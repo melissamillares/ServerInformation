@@ -1,22 +1,23 @@
 <!DOCTYPE html>
-<html>
 
+<html>
     <head>
+        <meta http-equiv=”Content-Type” content=”text/html; charset=UTF-8″ />       
         <title>Server Info</title>
-        <script src="https://unpkg.com/vue"></script>
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <script src="https://unpkg.com/vue"></script> 
+        <link rel="stylesheet" type="text/css" href="./assets/styles.css">                          
     </head>
 
     <body>
-        <div id="app">
-            <h1>{{ tittle }}</h1>
-            <h3>{{ message }}</h3>
+        <div id="app">            
+            <h1>Server Information</h1>  
 
-            <input type="text" v-model="url">
-            <button >Get Information</button>
-            
-            <!-- prueba -->
-            <h3>{{ url }}</h3>
+            <form method="POST">
+                <h3>Enter the URL of the website you want to search (e.g. https://google.com)</h3> 
+                <input type="text" name="purl">
+                
+                <input type="submit" value="Get Information">
+            </form>                        
         </div>
 
         <!-- development version, includes helpful console warnings -->
