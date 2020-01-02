@@ -50,7 +50,7 @@ func insertServersDB(db *sql.DB, address net.IP, ssl_grade string, country strin
 }
 
 func query(db *sql.DB) {	
-	rows, err := db.Query("SELECT address, ssl_grade, country, owner FROM servers")
+	rows, err := db.Query("SELECT * FROM servers")
 	
     if err != nil {
         fmt.Println(err)

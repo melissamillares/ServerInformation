@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"golang.org/x/net/html"
 	"io"
+	"io/ioutil"
 	"strings"
 	"github.com/likexian/whois-go"		
 )
@@ -58,15 +59,40 @@ func getInfoWhoIs(s string, ips []net.IP) string {
 				
 		// search in splitresult orgname
 		for _, val := range splitResult {
-			if strings.Contains(val, s) {
-				//fmt.Println(val)
-				info := strings.Trim(val, s)
-				//fmt.Println(info)
+			if strings.Contains(val, s) {				
+				info := strings.Trim(val, s)				
 				return info
 			}
 		}		
 	}
 	return ""	
+}
+
+func getSSLGrade(host string) string {
+	u := "https://api.ssllabs.com/api/v3/analyze?host=" + host
+	resp, err := http.Get(u)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		panic(err)
+	}
+
+	splitResult := strings.Split(string(body), ",")	
+	for _, val := range splitResult {		
+		if strings.Contains(val, "grade") {
+			ssl := strings.Trim(val, "\"grade\":")		
+			return ssl
+		}
+	}
+
+	return ""
 }
 
 /* func getHTML(urlString string) string {
