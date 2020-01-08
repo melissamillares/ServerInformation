@@ -1,21 +1,17 @@
 package main
 
-import (
+/* import (
 	"fmt"
 	"time"		
-)
+) */
 
 var input string
 
 func main() {
-	//r := chi.NewRouter()
-
-	//r.Get("/", h)
-	//http.ListenAndServe(":3000", r)
-
+	//t()	
 	database := connDB()
-
-	fmt.Print("ingrese: ")	
+	routes()
+	/* fmt.Print("ingrese: ")	
 	fmt.Scanf("%s", &input)
 
 	outputURL := isURL(input)
@@ -25,7 +21,7 @@ func main() {
 		//fmt.Println(outputHost)
 
 		// array with the server IPs 
-		outputIPs := getIP(outputHost)			
+		outputIPs := getIP(outputHost)				
 		// server owner
 		outputInfoName := getInfoWhoIs("OrgName: ", outputIPs)
 		// server country
@@ -33,16 +29,22 @@ func main() {
 		// domain html tittle
 		outputTittle := getTitle(input, "title")
 		// SSL grade
-		outputSSL := getSSLGrade(outputHost)
+		outputSSL := getSSLGrade(outputHost, len(outputIPs))
+		// lower SSL grade
+		outputLowerSSL := getLowerGrade(outputSSL)
+		fmt.Println(outputLowerSSL)
+		//
+		outputDown := isServerDown(input)
+		fmt.Println(outputDown)
 		
 		// insert data
-		insertDomainsDB(database, outputHost, "", outputTittle, time.Now())
-		for _, value := range outputIPs {  		
-			insertServersDB(database, value, outputSSL, outputInfoCountry, outputInfoName, outputHost, time.Now())	
-		}
+		//insertDomainsDB(database, outputHost, "", outputTittle, time.Now())
+		for i, value := range outputIPs {  				
+			//insertServersDB(database, value, outputSSL[i], outputInfoCountry, outputInfoName, outputHost, time.Now())	
+		} 
 		//query(database)
-	}	
+	}	*/
 
 	// close the connection to the DB
-	defer database.Close()
+	defer database.Close() 	
 }

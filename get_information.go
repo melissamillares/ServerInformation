@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"	
 	"net"
 	"net/url"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"strings"
+	"sort"
 	"github.com/likexian/whois-go"		
 )
 
@@ -68,9 +70,10 @@ func getInfoWhoIs(s string, ips []net.IP) string {
 	return ""	
 }
 
-func getSSLGrade(host string) string {
+func getSSLGrade(host string, length int) []string {
 	u := "https://api.ssllabs.com/api/v3/analyze?host=" + host
 	resp, err := http.Get(u)
+	sslgrades := make([]string, length)
 
 	if err != nil {
 		panic(err)
@@ -82,18 +85,43 @@ func getSSLGrade(host string) string {
 
 	if err != nil {
 		panic(err)
-	}
-
-	splitResult := strings.Split(string(body), ",")	
+	}	
+	splitResult := strings.Split(string(body), ",")		
 	for _, val := range splitResult {		
 		if strings.Contains(val, "grade") {
-			ssl := strings.Trim(val, "\"grade\":")		
-			return ssl
+			ssl := strings.Trim(val, "\"grade\":")
+			for i := 0; i < length; i++ {
+				sslgrades[i] = ssl
+			}							
+			return sslgrades
 		}
 	}
 
-	return ""
+	return sslgrades
 }
+
+//
+func getLowerGrade(ssl []string) string {
+	sort.Strings(ssl)
+	last_index := len(ssl) - 1
+	return ssl[last_index]
+}
+
+//
+func isServerDown(urlString string) bool {
+	_, err := http.Get(urlString)
+
+	if err != nil {
+		return true
+	}
+	
+	return false
+}
+
+//
+//func serversChanged() bool {
+
+//}
 
 /* func getHTML(urlString string) string {
 
@@ -104,7 +132,7 @@ func getTitle(urlString string, s string) string {
 	resp, err := http.Get(urlString)
 
 	if err != nil {
-		panic(err)
+		fmt.Println("No HTML file")
 	}
 	defer resp.Body.Close()
 
