@@ -13,7 +13,7 @@ import (
 	"github.com/likexian/whois-go"		
 )
 
-// 
+// verify if the string is a URL
 func isURL(urlString string) bool {
 	_, err := url.ParseRequestURI(urlString)
 
@@ -27,13 +27,14 @@ func isURL(urlString string) bool {
 //
 func hostName(urlString string) string {
 	u, err := url.Parse(urlString) 
+	var hoststring string
 
 	if err != nil {
 		panic(err)
 	} else {
-		hoststring := u.Hostname()
-		return hoststring
+		hoststring = u.Hostname()
 	}	
+	return hoststring
 }
 
 //
@@ -103,7 +104,22 @@ func getSSLGrade(host string, length int) []string {
 //
 func getLowerGrade(ssl []string) string {
 	sort.Strings(ssl)
+	
+	if len(ssl) == 1 {
+	    return ssl[0]
+	}
 	last_index := len(ssl) - 1
+	
+	for _, val := range ssl {
+	    if val == "" {
+		return val
+	    }
+	}
+	// compares if the last position is equal to the previous position plus the symbol "+"
+	if ssl[last_index] == ssl[last_index- 1]+"+" {
+	    return ssl[last_index - 1]
+	} 
+
 	return ssl[last_index]
 }
 
@@ -157,7 +173,7 @@ func getTitle(urlString string, s string) string {
 			if s == token.Data {
 				//the next token should be the page title
 				tokenType = tokenizer.Next()				
-				//report the page title and break out of the loop
+				//get the page title
 				result := tokenizer.Token().Data			
 				return result				
 			}

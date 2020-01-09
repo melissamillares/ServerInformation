@@ -1,0 +1,4 @@
+user: maxroach
+h: localhost
+port: 26257
+db: prueba_truora
