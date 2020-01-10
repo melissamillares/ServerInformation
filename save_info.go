@@ -34,7 +34,7 @@ func getServers(r string) []Server {
 	return servers
 }
 
-func getDomain(r string, servers []Server) Domain {	
+func getDomain(r string, servers []Server) *Domain {	
 	outputURL := isURL(r)
 	domain := Domain{}
 
@@ -60,5 +60,5 @@ func getDomain(r string, servers []Server) Domain {
 		}
 	}	
 
-	return domain
+	return &domain
 }

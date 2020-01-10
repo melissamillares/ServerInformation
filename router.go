@@ -1,8 +1,6 @@
 package main
 
-import (
-	//"fmt"
-	//"bytes"
+import (	
 	"net/http"
 	"html/template"
 	"encoding/json"
@@ -27,29 +25,28 @@ func routes() http.Handler {
 func addDomain(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")			
 	defer r.Body.Close()	
-	domain := Domain{}	
-	servers := []Server{}
+	var domain *Domain
+	var url string
+	servers := []Server{}	
+	// obtain the url value in the request body (e.g. url="https://truora.com")
+	err := json.NewDecoder(r.Body).Decode(&url)
 
-	//buf := new(bytes.Buffer)
-    //buf.ReadFrom(r.Body)
-    //newStr := buf.String()
-
-	servers = getServers("https://gnula.nu/")
-	domain = getDomain("https://gnula.nu/", servers)
-
-	domain.insertDomainsDB()	
-	u := domain.URL // get the url from the domain
-	dID := domain.GetDomainID(u)
-	for _, server := range servers {
-		server.DomainID = dID		
-		server.insertServersDB()
-	} 
-
-	err := json.NewDecoder(r.Body).Decode(&domain)
     if err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
 	}
+
+	servers = getServers(url) // get the information to be saved in database
+	domain = getDomain(url, servers) // get the information to be saved in database
+
+	domain.insertDomainsDB()	
+	u := domain.URL // get the url from the domain
+	dID := domain.GetDomainID(u) // get the id from the domain	
+
+	for _, server := range servers {
+		server.DomainID = dID		
+		server.insertServersDB()
+	} 
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(domain)

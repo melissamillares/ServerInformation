@@ -2,42 +2,11 @@ package main
 
 import (
 	"fmt"
-	"time"
 	"strings"
 	"io/ioutil"
 	"database/sql"
 	_ "github.com/lib/pq"
 )
-
-// struct with the server information, the info has to be parsed to JSON 
-type Server struct { 
-	ID int 				`json:"-"`   
-	Address string    	`json:"address"`
-	SSL_grade string  	`json:"ssl_grade"`
-	Country string   	`json:"country"`
-	Owner string      	`json:"owner"` 
-	DomainID int 	`json:"-"` 
-	Domain string 	  	`json:"-"`
-	Created time.Time 	`json:"-"`
-}
-
-// struct with the server information
-type Domain struct {
-	ID int 					`json:"-"` 
-	URL string				`json:"-"`
-	Servers []Server		`json:"servers"`
-	Servers_Changed bool    `json:"servers_changed"`
-	SSL string				`json:"ssl_grade"`
-	Previous_SSL string 	`json:"previous_ssl_grade"`
-	Logo string 			`json:"logo"`
-	Title string 			`json:"title"`
-	Is_Down bool 			`json:"is_down"`	
-	Created time.Time		`json:"-"`
-}
-
-type Items struct {
-	Domain []Domain
-}
 
 // variables for connection with database
 var user string
@@ -70,10 +39,10 @@ func readFile() {
 	}	
 }
 
-// make the connection with the database
+// make the connection with the database and create the tables domains and servers
 func connDB() *sql.DB {   
 	readFile()
-	d := "postgresql://"+user+"@"+host+":"+port+"/"+database+"?ssl=true&sslmode=require&sslrootcert=certs/ca.crt&sslkey=certs/client."+user+".key&sslcert=certs/client."+user+".crt"   
+	d := fmt.Sprintf("postgresql://%s@%s:%s/%s?ssl=true&sslmode=require&sslrootcert=certs/ca.crt&sslkey=certs/client.%s.key&sslcert=certs/client.%s.crt", user, host, port, database, user, user)  
 	db, err := sql.Open("postgres", d)
 	
 	if err != nil {
@@ -94,7 +63,7 @@ func connDB() *sql.DB {
 	return db
 } 
 
-//
+// insert the data to the domains database, this function can be used only by type Domain
 func (d Domain) insertDomainsDB() {
 	db := connDB()
 	
@@ -108,7 +77,7 @@ func (d Domain) insertDomainsDB() {
 	defer db.Close()
 }
 
-// insert the data to the servers database
+// insert the data to the servers database, this function can be used only by type Server
 func (s Server) insertServersDB()  {		
 	db := connDB()
 	

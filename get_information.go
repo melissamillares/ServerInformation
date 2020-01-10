@@ -50,18 +50,16 @@ func getIP(urlString string) []net.IP {
 }
 
 // get the information s from the query whois
+// (e.g. s="Country: " returns the country associated with the IP)
 func getInfoWhoIs(s string, ips []net.IP) string {
-	for _, value := range ips {
-		result, err := whois.Whois(value.String())
-		
-		if err != nil {
-			//fmt.Println(result)
+	for _, ip := range ips {
+		result, err := whois.Whois(ip.String())		
+		if err != nil {			
 			panic(err)
 		}
-
-		splitResult := strings.Split(result, "\n")
-				
-		// search in splitresult orgname
+		// split the result from whois by \n
+		splitResult := strings.Split(result, "\n")				
+		// search in splitresult the string s
 		for _, val := range splitResult {
 			if strings.Contains(val, s) {				
 				info := strings.Trim(val, s)				
@@ -72,13 +70,16 @@ func getInfoWhoIs(s string, ips []net.IP) string {
 	return ""	
 }
 
+// returns an array with the SSL grade of the host servers
+// length: the length from the IPs array (associated with the host servers)
 func getSSLGrade(host string, length int) []string {
-	u := "https://api.ssllabs.com/api/v3/analyze?host=" + host
+	u := fmt.Sprintf("https://api.ssllabs.com/api/v3/analyze?host=%s", host)
 	resp, err := http.Get(u)
-	sslgrades := make([]string, length)
+	sslgrades := make([]string, length) // array with the length from the IPs array
 
 	if err != nil {
-		panic(err)
+		//panic(err)
+		fmt.Println(err)
 	}
 
 	defer resp.Body.Close()
@@ -102,21 +103,23 @@ func getSSLGrade(host string, length int) []string {
 	return sslgrades
 }
 
-//
+// ssl: array with the SSL grade from the servers
+// returns 
 func getLowerGrade(ssl []string) string {
-	sort.Strings(ssl)
+	sort.Strings(ssl) // sorts the array in increasing order
 	
-	if len(ssl) == 1 {
+	if len(ssl) == 1 { // if the array only has one element, returns that element
 	    return ssl[0]
 	}
 	last_index := len(ssl) - 1
 	
 	for _, val := range ssl {
-	    if val == "" {
+	    if val == "" { // if the array has one grade equal to "", returns ""
 		return val
 	    }
 	}
-	// compares if the last position is equal to the previous position plus the symbol "+"
+	// compares if the last position is equal to the previous position concatenated 
+	// with the symbol "+", returns the previous position
 	if ssl[last_index] == ssl[last_index- 1]+"+" {
 	    return ssl[last_index - 1]
 	} 
@@ -144,7 +147,7 @@ func isServerDown(urlString string) bool {
 
 } */
 
-// 
+// Reads HTML file and return the data that matches s 
 func getTitle(urlString string, s string) string {
 	resp, err := http.Get(urlString)
 
@@ -156,24 +159,21 @@ func getTitle(urlString string, s string) string {
 	//create a new tokenizer over the response body
 	tokenizer := html.NewTokenizer(resp.Body)
 	for {
-		tokenType := tokenizer.Next()
+		tokenType := tokenizer.Next() // get the token type
 		
 		if tokenType == html.ErrorToken {
-			err := tokenizer.Err()
-			//fmt.Println(err)
-			if err == io.EOF {
-				//end of the file, break out of the loop
-				break
+			err := tokenizer.Err()			
+			if err == io.EOF {				
+				break //end of the file
 			}			
 		}		
 		
 		if tokenType == html.StartTagToken {
-			//get the token
+			// get the token
 			token := tokenizer.Token()			
-			//if the name of the element is s
-			if s == token.Data {
-				//the next token should be the page title
-				tokenType = tokenizer.Next()				
+			// if the name of the element is the string s (e.g. s="title")
+			if s == token.Data {				
+				tokenType = tokenizer.Next() 	// get the type of the next token			
 				//get the page title
 				result := tokenizer.Token().Data			
 				return result				
