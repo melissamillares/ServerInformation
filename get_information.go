@@ -18,7 +18,8 @@ func isURL(urlString string) bool {
 	_, err := url.ParseRequestURI(urlString)
 
 	if err != nil {			
-		panic(err)					
+		//panic(err)					
+		return false
 	} else {	
 		return true
 	}		
@@ -180,4 +181,9 @@ func getTitle(urlString string, s string) string {
 		}	
 	}
 	return ""
+}
+
+func isLast(d Domain) bool {
+	
+	return false
 }

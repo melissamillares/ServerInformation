@@ -2,6 +2,7 @@ package main
 
 import (
 	//"fmt"
+	//"bytes"
 	"net/http"
 	"html/template"
 	"encoding/json"
@@ -49,16 +50,20 @@ func addServers(w http.ResponseWriter, r *http.Request) {
 func addDomain(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")			
 	defer r.Body.Close()	
-	domain := Domain{}
-	//server := Server{}
+	domain := Domain{}	
+	servers := []Server{}
 
-	domain = getDomain("https://truora.com")
-	servers := getServers("https://truora.com")
+	//buf := new(bytes.Buffer)
+    //buf.ReadFrom(r.Body)
+    //newStr := buf.String()
 
-	for _, server := range servers {
+	servers = getServers("https://facebook.com")
+	domain = getDomain("https://facebook.com", servers)
+
+	domain.insertDomainsDB()	
+	for _, server := range servers {		
 		server.insertServersDB()
-	}
-	domain.insertDomainsDB()
+	} 
 
 	err := json.NewDecoder(r.Body).Decode(&domain)
     if err != nil {

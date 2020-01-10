@@ -120,7 +120,7 @@ func (s Server) insertServersDB()  {
 func (s *Server) GetServers() []Server {	
 	db := connDB()	
 	servers := []Server{} // servers array 
-	rows, _ := db.Query(`SELECT address, ssl_grade, country, owner, domain FROM servers`)
+	rows, _ := db.Query(`SELECT address, ssl_grade, country, owner, domain FROM servers `)
 
 	for rows.Next() {
 		rows.Scan(&s.Address, &s.SSL_grade, &s.Country, &s.Owner, &s.Domain) 
@@ -161,8 +161,7 @@ func (d *Domain) GetDomain() Domain {
 				Logo: d.Logo,
 				Title: d.Title,
 				Is_Down: d.Is_Down,
-			} 		
-		//return domain
+			} 				
 	}
 
 	defer db.Close()

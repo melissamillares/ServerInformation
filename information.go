@@ -17,13 +17,13 @@ func getServers(r string) []Server {
 		country := getInfoWhoIs("Country: ", IPs) // server country							
 		ssl := getSSLGrade(host, len(IPs)) // SSL grade		
 
-		for _, value := range ssl {
+		for i, value := range ssl {
 			server = Server {
-				Address: host,
+				Address: IPs[i].String(),
 				SSL_grade: value,
 				Country: country,
 				Owner: owner,
-				Domain: r,
+				Domain: host,
 				Created: time.Now(),
 			}
 			servers = append(servers, server)
@@ -33,11 +33,11 @@ func getServers(r string) []Server {
 	return servers
 }
 
-func getDomain(r string) Domain {	
+func getDomain(r string, servers []Server) Domain {	
 	outputURL := isURL(r)
 	domain := Domain{}
-	servers := []Server{}
-	servers = getServers(r)
+	//servers := []Server{}
+	//servers = getServers(r)
 
 	if outputURL {
 		host := hostName(r)
@@ -48,6 +48,7 @@ func getDomain(r string) Domain {
 		serverDown := isServerDown(r)		
 
 		domain = Domain{
+			URL: host,
 			Servers: servers,
 			Servers_Changed: false,
 			SSL: lowerSSL,
