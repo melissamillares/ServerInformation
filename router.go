@@ -24,29 +24,6 @@ func routes() http.Handler {
 	return r
 }
 
-func addServers(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")		
-	server := Server{}
-	defer r.Body.Close()	
-
-	err := json.NewDecoder(r.Body).Decode(&server)
-	server.insertServersDB()
-	/* servers := getServers("https://truora.com")
-
-	for _, value := range servers {
-		server = value
-		server.insertServersDB()
-	} */
-
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-	}
-
-	//w.WriteHeader(http.StatusOK)
-	//return server
-}
-
 func addDomain(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")			
 	defer r.Body.Close()	
@@ -57,11 +34,14 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
     //buf.ReadFrom(r.Body)
     //newStr := buf.String()
 
-	servers = getServers("https://facebook.com")
-	domain = getDomain("https://facebook.com", servers)
+	servers = getServers("https://truora.com")
+	domain = getDomain("https://truora.com", servers)
 
 	domain.insertDomainsDB()	
-	for _, server := range servers {		
+	u := domain.URL // get the url from the domain
+	dID := domain.GetDomainID(u)
+	for _, server := range servers {
+		server.DomainID = dID		
 		server.insertServersDB()
 	} 
 
@@ -81,15 +61,14 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
             return
         }
 
-		pageurl := r.FormValue("purl")
-		
-		fmt.Fprintf(w, pageurl)		
+		pageurl := r.FormValue("purl")	
 	} */  
 }
 
 func listDomainServers(w http.ResponseWriter, r *http.Request) {
 	dom := &Domain{}
-	d := dom.GetDomain()
+	d := dom.GetDomain() // domain array
+
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "	")
 	enc.Encode(d)

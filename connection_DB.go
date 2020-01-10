@@ -11,17 +11,20 @@ import (
 )
 
 // struct with the server information, the info has to be parsed to JSON 
-type Server struct {    
+type Server struct { 
+	ID int 				`json:"-"`   
 	Address string    	`json:"address"`
 	SSL_grade string  	`json:"ssl_grade"`
 	Country string   	`json:"country"`
 	Owner string      	`json:"owner"` 
-	Domain string 	  	`json:"-"` 
+	DomainID int 	`json:"-"` 
+	Domain string 	  	`json:"-"`
 	Created time.Time 	`json:"-"`
 }
 
 // struct with the server information
 type Domain struct {
+	ID int 					`json:"-"` 
 	URL string				`json:"-"`
 	Servers []Server		`json:"servers"`
 	Servers_Changed bool    `json:"servers_changed"`
@@ -31,6 +34,10 @@ type Domain struct {
 	Title string 			`json:"title"`
 	Is_Down bool 			`json:"is_down"`	
 	Created time.Time		`json:"-"`
+}
+
+type Items struct {
+	Domain Domain
 }
 
 // variables for connection with database
@@ -76,9 +83,9 @@ func connDB() *sql.DB {
 	// close the connection to the DB
 	//defer db.Close()
 	// Create the "domains" table
-	_, erd := db.Exec(`CREATE TABLE IF NOT EXISTS domains(url STRING, servers_changed BOOL, ssl_grade STRING, previous_ssl STRING, logo STRING, title STRING, is_down BOOL, created STRING, PRIMARY KEY (url, created))`)
+	_, erd := db.Exec(`CREATE TABLE IF NOT EXISTS domains(id SERIAL PRIMARY KEY, url STRING, servers_changed BOOL, ssl_grade STRING, previous_ssl STRING, logo STRING, title STRING, is_down BOOL, created STRING)`)
 	// Create the "servers" table.
-	_, ers := db.Exec(`CREATE TABLE IF NOT EXISTS servers(address STRING, ssl_grade STRING, country STRING, owner STRING, domain STRING, created STRING, PRIMARY KEY (address,created), FOREIGN KEY (domain) REFERENCES domains(url))`)	
+	_, ers := db.Exec(`CREATE TABLE IF NOT EXISTS servers(id SERIAL PRIMARY KEY, address STRING, ssl_grade STRING, country STRING, owner STRING, domainID SERIAL, domain STRING, created STRING, FOREIGN KEY (domainID) REFERENCES domains(id))`)	
 
 	if ers != nil || erd != nil {
 		fmt.Println(ers)
@@ -106,8 +113,8 @@ func (d Domain) insertDomainsDB() {
 func (s Server) insertServersDB()  {		
 	db := connDB()
 	
-	q, err := db.Prepare(`INSERT INTO servers (address, ssl_grade, country, owner, domain, created) VALUES ($1, $2, $3, $4, $5, $6)`)
-	q.Exec(s.Address, s.SSL_grade, s.Country, s.Owner, s.Domain, s.Created)
+	q, err := db.Prepare(`INSERT INTO servers (address, ssl_grade, country, owner, domainID, domain, created) VALUES ($1, $2, $3, $4, $5, $6, $7)`)
+	q.Exec(s.Address, s.SSL_grade, s.Country, s.Owner, s.DomainID, s.Domain, s.Created)
 
 	if err != nil {
 		fmt.Println(err)
@@ -137,14 +144,32 @@ func (s *Server) GetServers() []Server {
     return servers 
 }
 
+func (d *Domain) GetDomainID(host string) int {
+	db := connDB()
+	var id int
+
+	rows, err := db.Query(`SELECT id FROM (SELECT * FROM domains ORDER BY created) WHERE url = $1`, host)
+	if err != nil {
+		fmt.Println(err)		
+	}
+	defer db.Close()
+
+	for rows.Next() {    
+        rows.Scan(&d.ID)        
+		id = d.ID
+	}
+
+	defer db.Close()
+	return id
+}
+
 func (d *Domain) GetDomain() Domain {	
 	db := connDB()
 	serv := Server{}
 	domain := Domain {}
 	s := serv.GetServers()
 
-	rows, err := db.Query(`SELECT servers_changed, ssl_grade, previous_ssl, logo, title, is_down FROM domains`)
-	
+	rows, err := db.Query(`SELECT servers_changed, ssl_grade, previous_ssl, logo, title, is_down FROM domains`)	
     if err != nil {
 		fmt.Println(err)		
 	}
@@ -162,6 +187,37 @@ func (d *Domain) GetDomain() Domain {
 				Title: d.Title,
 				Is_Down: d.Is_Down,
 			} 				
+	}
+
+	defer db.Close()
+    return domain
+}
+
+func (d *Domain) GetDomains() []Domain {	
+	db := connDB()
+	serv := Server{}
+	domain := []Domain{}
+	s := serv.GetServers()
+
+	rows, err := db.Query(`SELECT servers_changed, ssl_grade, previous_ssl, logo, title, is_down FROM domains`)
+	
+    if err != nil {
+		fmt.Println(err)		
+	}
+	
+	defer rows.Close()
+		
+    for rows.Next() {    
+        rows.Scan(&d.Servers_Changed, &d.SSL, &d.Previous_SSL, &d.Logo, &d.Title, &d.Is_Down)        
+		domain = append(domain, Domain {
+				Servers: s,
+				Servers_Changed: d.Servers_Changed,
+				SSL: d.SSL,
+				Previous_SSL: d.Previous_SSL,
+				Logo: d.Logo,
+				Title: d.Title,
+				Is_Down: d.Is_Down,
+			})
 	}
 
 	defer db.Close()
