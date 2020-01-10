@@ -34,8 +34,8 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
     //buf.ReadFrom(r.Body)
     //newStr := buf.String()
 
-	servers = getServers("https://truora.com")
-	domain = getDomain("https://truora.com", servers)
+	servers = getServers("https://gnula.nu/")
+	domain = getDomain("https://gnula.nu/", servers)
 
 	domain.insertDomainsDB()	
 	u := domain.URL // get the url from the domain
@@ -67,7 +67,7 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 
 func listDomainServers(w http.ResponseWriter, r *http.Request) {
 	dom := &Domain{}
-	d := dom.GetDomain() // domain array
+	d := dom.GetDomain() 
 
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "	")
