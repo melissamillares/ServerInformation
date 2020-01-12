@@ -15,6 +15,7 @@ type Server struct {
 	DomainID int 		`json:"-"` 
 	Domain string 	  	`json:"-"`
 	Created time.Time 	`json:"-"`
+	Updated time.Time 	`json:"-"`
 }
 
 // struct with the server information
@@ -29,9 +30,10 @@ type Domain struct {
 	Title string 			`json:"title"`
 	Is_Down bool 			`json:"is_down"`	
 	Created time.Time		`json:"-"`
+	Updated time.Time 		`json:"-"`
 }
 
 // struct with a Domain array
 type Items struct {
-	Domain []Domain
+	Domains []Domain `json:"items"`
 }

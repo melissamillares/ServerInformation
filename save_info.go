@@ -26,6 +26,34 @@ func getServers(r string) []Server {
 				//DomainID: host,
 				Domain: host,
 				Created: time.Now(),
+				Updated: time.Time{}, // null time
+			}
+			servers = append(servers, server)
+		}
+	}
+
+	return servers
+}
+
+func getUpdatedServers(r string) []Server {
+	outputURL := isURL(r)
+	var server Server
+	var servers []Server
+
+	if outputURL {
+		host := hostName(r)
+		IPs := getIP(host) // array with the server IPs
+		owner := getInfoWhoIs("OrgName: ", IPs) // server owner		
+		country := getInfoWhoIs("Country: ", IPs) // server country							
+		ssl := getSSLGrade(host, len(IPs)) // SSL grade		
+
+		for i, value := range ssl {
+			server = Server {				
+				Address: IPs[i].String(),
+				SSL_grade: value,
+				Country: country,
+				Owner: owner,								
+				Updated: time.Now(),			
 			}
 			servers = append(servers, server)
 		}
@@ -41,7 +69,8 @@ func getDomain(r string, servers []Server) *Domain {
 	if outputURL {
 		host := hostName(r)
 		IPs := getIP(host) // array with the server IPs			
-		title := getTitle(r, "title") // domain html title		
+		title := getTitle(r) // domain html title	
+		logo := getLogo(r) // html logo
 		ssl := getSSLGrade(host, len(IPs)) // SSL grade		
 		lowerSSL := getLowerGrade(ssl) // lower SSL grade
 		serverDown := isServerDown(r)		
@@ -53,12 +82,42 @@ func getDomain(r string, servers []Server) *Domain {
 			Servers_Changed: false,
 			SSL: lowerSSL,
 			Previous_SSL: lowerSSL,
-			Logo: lowerSSL,
+			Logo: logo,
 			Title: title,
 			Is_Down: serverDown,
 			Created: time.Now(),
+			Updated: time.Time{}, // null time
 		}
 	}	
 
 	return &domain
 }
+
+func getUpdatedDomain(r string, servers []Server) *Domain {
+	outputURL := isURL(r)
+	domain := Domain{}
+
+	if outputURL {
+		host := hostName(r)
+		IPs := getIP(host) // array with the server IPs							
+		ssl := getSSLGrade(host, len(IPs)) // SSL grade	
+		title := getTitle(r) // domain html title	
+		logo := getLogo(r) // html logo	
+		lowerSSL := getLowerGrade(ssl) // lower SSL grade
+		serverDown := isServerDown(r)			
+
+		domain = Domain{
+			Servers: servers,
+			Servers_Changed: true,
+			SSL: lowerSSL,
+			Previous_SSL: lowerSSL,
+			Logo: logo,
+			Title: title,
+			Is_Down: serverDown,
+			Updated: time.Now(),
+		}
+	}	
+
+	return &domain
+}
+

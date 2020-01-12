@@ -51,9 +51,9 @@ func connDB() *sql.DB {
 	// close the connection to the DB
 	//defer db.Close()
 	// Create the "domains" table
-	_, erd := db.Exec(`CREATE TABLE IF NOT EXISTS domains(id SERIAL PRIMARY KEY, url STRING, servers_changed BOOL, ssl_grade STRING, previous_ssl STRING, logo STRING, title STRING, is_down BOOL, created STRING)`)
+	_, erd := db.Exec(`CREATE TABLE IF NOT EXISTS domains(id SERIAL PRIMARY KEY, url STRING, servers_changed BOOL, ssl_grade STRING, previous_ssl STRING, logo STRING, title STRING, is_down BOOL, created STRING, updated STRING)`)
 	// Create the "servers" table.
-	_, ers := db.Exec(`CREATE TABLE IF NOT EXISTS servers(id SERIAL PRIMARY KEY, address STRING, ssl_grade STRING, country STRING, owner STRING, domainID SERIAL, domain STRING, created STRING, FOREIGN KEY (domainID) REFERENCES domains(id))`)	
+	_, ers := db.Exec(`CREATE TABLE IF NOT EXISTS servers(id SERIAL PRIMARY KEY, address STRING, ssl_grade STRING, country STRING, owner STRING, domainID SERIAL, domain STRING, created STRING, updated STRING, FOREIGN KEY (domainID) REFERENCES domains(id))`)	
 
 	if ers != nil || erd != nil {
 		fmt.Println(ers)
@@ -67,8 +67,8 @@ func connDB() *sql.DB {
 func (d Domain) insertDomainsDB() {
 	db := connDB()
 	
-	q, err := db.Prepare(`INSERT INTO domains (url, servers_changed, ssl_grade, previous_ssl, logo, title, is_down, created) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`)
-	q.Exec(d.URL, d.Servers_Changed, d.SSL, d.Previous_SSL, d.Logo, d.Title, d.Is_Down, d.Created)
+	q, err := db.Prepare(`INSERT INTO domains (url, servers_changed, ssl_grade, previous_ssl, logo, title, is_down, created, updated) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`)
+	q.Exec(d.URL, d.Servers_Changed, d.SSL, d.Previous_SSL, d.Logo, d.Title, d.Is_Down, d.Created, d.Updated)
 	
 	if err != nil {
 		fmt.Println(err)
@@ -78,11 +78,11 @@ func (d Domain) insertDomainsDB() {
 }
 
 // insert the data to the servers database, this function can be used only by type Server
-func (s Server) insertServersDB()  {		
+func (s Server) insertServersDB() {		
 	db := connDB()
 	
-	q, err := db.Prepare(`INSERT INTO servers (address, ssl_grade, country, owner, domainID, domain, created) VALUES ($1, $2, $3, $4, $5, $6, $7)`)
-	q.Exec(s.Address, s.SSL_grade, s.Country, s.Owner, s.DomainID, s.Domain, s.Created)
+	q, err := db.Prepare(`INSERT INTO servers (address, ssl_grade, country, owner, domainID, domain, created, updated) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`)
+	q.Exec(s.Address, s.SSL_grade, s.Country, s.Owner, s.DomainID, s.Domain, s.Created, s.Updated)
 
 	if err != nil {
 		fmt.Println(err)

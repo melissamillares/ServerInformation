@@ -1,7 +1,7 @@
 package main
 
 import (	
-	"net/http"
+	"net/http"	
 	"html/template"
 	"encoding/json"
 	_ "github.com/lib/pq"
@@ -13,9 +13,12 @@ var tmpl = template.Must(template.ParseFiles("index.html"))
 func routes() http.Handler {
 	r := chi.NewRouter()
 
-	r.Route("/servers", func(r chi.Router) { // first endpoint
+	r.Route("/domain", func(r chi.Router) { // first endpoint
 		r.Get("/", listDomainServers)  // GET 
 		r.Post("/", addDomain) // POST 
+	})
+	r.Route("/alldomains", func(r chi.Router) { // second endpoint
+		r.Get("/", listAllDomains)  // GET 
 	})
 	http.ListenAndServe(":3000", r)
 
@@ -27,10 +30,10 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()	
 	var domain *Domain
 	var url string
+	var changed bool
 	servers := []Server{}	
 	// obtain the url value in the request body (e.g. url="https://truora.com")
 	err := json.NewDecoder(r.Body).Decode(&url)
-
     if err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
@@ -38,14 +41,27 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 
 	servers = getServers(url) // get the information to be saved in database
 	domain = getDomain(url, servers) // get the information to be saved in database
-
 	domain.insertDomainsDB()	
 	u := domain.URL // get the url from the domain
-	dID := domain.GetDomainID(u) // get the id from the domain	
+	dID := domain.getDomainID(u) // get the id from the domain
 
 	for _, server := range servers {
+		var servs []Server	
 		server.DomainID = dID		
 		server.insertServersDB()
+		
+		last := server.getServerOneHourAgo()											
+		changed = equalServers(last, server)
+		
+		if changed == true {								
+			servs = getUpdatedServers(url)
+			for _, s := range servs {
+				s.updateServer(dID)
+			}
+
+			domain = getUpdatedDomain(url, servs)
+			domain.updateDomain()	
+		} 									
 	} 
 
 	w.WriteHeader(http.StatusOK)
@@ -64,9 +80,22 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 
 func listDomainServers(w http.ResponseWriter, r *http.Request) {
 	dom := &Domain{}
-	d := dom.GetDomain() 
+	d := dom.getDomain() 
 
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "	")
 	enc.Encode(d)
+}
+
+func listAllDomains(w http.ResponseWriter, r *http.Request) {
+	dom := &Domain{}
+	d := dom.getDomains()
+	
+	items := Items{
+		Domains: d,
+	}
+
+	enc := json.NewEncoder(w)
+	enc.SetIndent("", "	")
+	enc.Encode(items)
 }
