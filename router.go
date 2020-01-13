@@ -1,14 +1,11 @@
 package main
 
 import (	
-	"net/http"	
-	"html/template"
+	"net/http"		
 	"encoding/json"
 	_ "github.com/lib/pq"
 	"github.com/go-chi/chi"	
 )
-
-var tmpl = template.Must(template.ParseFiles("index.html"))
 
 func routes() http.Handler {
 	r := chi.NewRouter()
@@ -17,7 +14,7 @@ func routes() http.Handler {
 		r.Get("/", listDomainServers)  // GET 
 		r.Post("/", addDomain) // POST 
 	})
-	r.Route("/alldomains", func(r chi.Router) { // second endpoint
+	r.Route("/getalldomains", func(r chi.Router) { // second endpoint
 		r.Get("/", listAllDomains)  // GET 
 	})
 	http.ListenAndServe(":3000", r)
@@ -40,10 +37,43 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 	}
 
 	servers = getServers(url) // get the information to be saved in database
-	domain = getDomain(url, servers) // get the information to be saved in database
-	domain.insertDomainsDB()	
+	domain = getDomain(url, servers) // get the information to be saved in database	
+
+	// check if it exists before inserting in database
+	exists := existsDomain(hostName(url))
+	if exists == true {
+		for _, server := range servers {
+			u := domain.URL // get the url from the domain
+			dID := domain.getDomainID(u) // get the id from the domain
+			var servs []Server	
+			server.DomainID = dID					
+			
+			last := server.getServerOneHourAgo()											
+			changed = equalServers(last, server)
+			
+			if changed == true {								
+				servs = getUpdatedServers(url)
+				for _, s := range servs {
+					s.updateServer(dID)
+				}
+	
+				domain = getUpdatedDomain(url, servs)
+				domain.updateDomain()	
+			} 									
+		} 
+	} else {
+		domain.insertDomainsDB()	
+		u := domain.URL // get the url from the domain
+		dID := domain.getDomainID(u) // get the id from the domain
+
+		for _, server := range servers {			
+			server.DomainID = dID		
+			server.insertServersDB()
+		}
+	}  
+	/*domain.insertDomainsDB()	
 	u := domain.URL // get the url from the domain
-	dID := domain.getDomainID(u) // get the id from the domain
+	dID := domain.getDomainID(u) // get the id from the domain 
 
 	for _, server := range servers {
 		var servs []Server	
@@ -62,20 +92,10 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 			domain = getUpdatedDomain(url, servs)
 			domain.updateDomain()	
 		} 									
-	} 
+	}  */
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(domain)
-	/* tmpl.Execute(w, nil)		
-	
-	if r.Method == "POST" {
-		if err := r.ParseForm(); err != nil {
-            fmt.Fprintf(w, "ParseForm() err: %v", err)
-            return
-        }
-
-		pageurl := r.FormValue("purl")	
-	} */  
+	json.NewEncoder(w).Encode(domain)	
 }
 
 func listDomainServers(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +111,7 @@ func listAllDomains(w http.ResponseWriter, r *http.Request) {
 	dom := &Domain{}
 	d := dom.getDomains()
 	
-	items := Items{
+	items := Items{		
 		Domains: d,
 	}
 

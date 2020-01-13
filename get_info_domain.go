@@ -45,6 +45,13 @@ func getLogo(urlString string) string {
 	body, _ := ioutil.ReadAll(resp.Body)
 	split := strings.Split(string(body), "><")
 
+	if len(split) == 1 {
+		split = strings.Split(string(body), "\n")
+		if len(split) == 1 {
+			split = strings.Split(string(body), " ")
+		}
+	}
+
 	for _, val := range split {	
 		//val = val[0:len(val)] strings.Contains(val, "link") &&
 		if strings.Contains(val, "rel=\"shortcut icon\"") {

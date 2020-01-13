@@ -34,6 +34,7 @@ type Domain struct {
 }
 
 // struct with a Domain array
-type Items struct {
+type Items struct {		
 	Domains []Domain `json:"items"`
+	// sacar los datos por separado en lugar de poner todo el domain
 }
