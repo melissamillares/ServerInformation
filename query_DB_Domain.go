@@ -38,6 +38,15 @@ func (d *Domain) updateDomain() {
 	defer db.Close()
 }
 
+func (d *Domain) updateServersChangedDomain() {
+	db := connDB()
+	
+	q, _ := db.Prepare(`UPDATE domains SET (servers_changed) = ($1) WHERE url = $2`)		
+	q.Exec(d.Servers_Changed, d.URL)
+	
+	defer db.Close()
+}
+
 func (d *Domain) getDomainID(host string) int {
 	db := connDB()
 	var id int

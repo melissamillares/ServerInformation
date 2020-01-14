@@ -60,6 +60,7 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 			changed = equalServers(last, server)
 			if changed == true {								
 				domain.Servers_Changed = true
+				domain.updateServersChangedDomain()
 			} 
 		}
 	} else {

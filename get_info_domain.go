@@ -42,70 +42,57 @@ func getLogo(urlString string) string {
 	}	
 	defer resp.Body.Close()
 
-	body, _ := ioutil.ReadAll(resp.Body)
-	split := strings.Split(string(body), "><")
+	body, _ := ioutil.ReadAll(resp.Body)	
+	split := strings.Split(string(body), "<")
 
-	if len(split) == 1 {
-		split = strings.Split(string(body), "\n")
-		if len(split) == 1 {
-			split = strings.Split(string(body), " ")
-		}
-	}
-
-	for _, val := range split {	
-		//val = val[0:len(val)] strings.Contains(val, "link") &&
-		if strings.Contains(val, "rel=\"shortcut icon\"") {
+	for _, val := range split {		
+		if strings.Contains(val, "rel=\"fluid-icon\"") {
+			val = strings.Trim(val, ">")
 			splitResult := strings.Split(val, " ")
 			for _, v := range splitResult {					
-				if strings.Contains(v, "href=") {						
-					logo := strings.Trim(v, "href=")						
-					//logo = strings.Replace(logo, "> ", "", 2)
+				if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {
+					logo := strings.Trim(v, "href=")											
 					resultLogo = logo
-					return resultLogo
+				}
+			}
+		} else if strings.Contains(val, "rel=\"shortcut icon\"") {
+			val = strings.Trim(val, ">")
+			splitResult := strings.Split(val, " ")
+			for _, v := range splitResult {					
+				if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {						
+					logo := strings.Trim(v, "href=")											
+					resultLogo = logo				
 				}				
 			}			
-		} else if strings.Contains(val, "rel=\"fluid-icon\""){
-			splitResult := strings.Split(val, " ")
-			for _, v := range splitResult {					
-				if strings.Contains(v, "href="){						
-					logo := strings.Trim(v, "href=")
-					//logo = strings.Replace(logo, "> ", "", 2)						
-					resultLogo = logo
-					return resultLogo
-				}				
-			}
 		} else if strings.Contains(val, "rel=\"apple-touch-icon\"") {
+			val = strings.Trim(val, ">")
 			splitResult := strings.Split(val, " ")
 			for _, v := range splitResult {					
-				if strings.Contains(v, "href=") {						
-					logo := strings.Trim(v, "href=")	
-					//logo = strings.Replace(logo, "> ", "", 2)					
-					resultLogo = logo					
-					return resultLogo
-				}								
-			}
+				if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {						
+					logo := strings.Trim(v, "href=")											
+					resultLogo = logo				
+				}				
+			}			
 		} else if strings.Contains(val, "rel=\"icon\"") {
+			val = strings.Trim(val, ">")
 			splitResult := strings.Split(val, " ")
 			for _, v := range splitResult {					
-				if strings.Contains(v, "href=") {						
-					logo := strings.Trim(v, "href=")	
-					//logo = strings.Replace(logo, "> ", "", 2)					
-					resultLogo = logo
-					return resultLogo
+				if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {						
+					logo := strings.Trim(v, "href=")											
+					resultLogo = logo				
 				}				
-			}
+			}			
 		} else if strings.Contains(val, "rel=\"mask-icon\"") {
+			val = strings.Trim(val, ">")
 			splitResult := strings.Split(val, " ")
 			for _, v := range splitResult {					
-				if strings.Contains(v, "href=") {						
-					logo := strings.Trim(v, "href=")	
-					//logo = strings.Replace(logo, "> ", "", 2)					
-					resultLogo = logo
-					return resultLogo
+				if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {						
+					logo := strings.Trim(v, "href=")											
+					resultLogo = logo				
 				}				
-			}
+			}			
 		}
-	}
+	}	
 	return resultLogo
 }
 
