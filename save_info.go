@@ -52,7 +52,8 @@ func getUpdatedServers(r string) []Server {
 				Address: IPs[i].String(),
 				SSL_grade: value,
 				Country: country,
-				Owner: owner,								
+				Owner: owner,	
+				Domain: host,							
 				Updated: time.Now(),			
 			}
 			servers = append(servers, server)
@@ -107,8 +108,9 @@ func getUpdatedDomain(r string, servers []Server) *Domain {
 		serverDown := isServerDown(r)			
 
 		domain = Domain{
+			URL: host,
 			Servers: servers,
-			Servers_Changed: true,
+			Servers_Changed: false,
 			SSL: lowerSSL,
 			Previous_SSL: lowerSSL,
 			Logo: logo,

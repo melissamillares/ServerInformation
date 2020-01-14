@@ -10,15 +10,15 @@
         <b-card  
             overlay
             img-src="https://cdn.pixabay.com/photo/2016/03/26/13/09/notebook-1280538_960_720.jpg" 
-            text-variant="white"         
-            title="Server Information"                          
+            text-variant="white"                                              
             style="max-width: 100rem;"            
-        >   
-        <b-card-text>                     
-            <h1>holi</h1>  
-            <p>{{ domains.servers }}</p> 
-            <b-button v-on:click="getAll" variant="info">Clic</b-button>
-        </b-card-text>  
+        >  
+            <h1>History</h1>
+            <b-card-text>                                      
+                <p>History of last domains consulted</p>
+                <p>{{ domains }}</p> 
+                <b-button v-on:click="getAll" variant="info">Clic</b-button>
+            </b-card-text>  
         </b-card>        
     </b-container> 
     <div >
@@ -35,7 +35,7 @@
         name: 'History', 
         data() {
             return {
-                domains: [],
+                domains: '',
                 errors: []
             }
         },

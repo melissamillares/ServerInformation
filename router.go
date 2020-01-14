@@ -11,7 +11,7 @@ func routes() http.Handler {
 	r := chi.NewRouter()
 
 	r.Route("/domain", func(r chi.Router) { // first endpoint
-		r.Get("/", listDomainServers)  // GET 
+		r.Get("/", listDomainServers)  // GET    BUSCAR POR ID???
 		r.Post("/", addDomain) // POST 
 	})
 	r.Route("/getalldomains", func(r chi.Router) { // second endpoint
@@ -44,25 +44,24 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 	// check if it exists before inserting in database
 	exists := existsDomain(hostName(url))
 	if exists == true {
+		//var servs []Server
+		servers = getUpdatedServers(url)
+		domain = getUpdatedDomain(url, servers)
+		domain.updateDomain()
+
+		u := domain.URL // get the host from the domain
+		dID := domain.getDomainID(u) // get the id from the domain
+
 		for _, server := range servers {
-			u := domain.URL // get the url from the domain
-			dID := domain.getDomainID(u) // get the id from the domain
-			var servs []Server	
-			server.DomainID = dID					
-			
+			server.DomainID = dID
+			server.updateServer(dID)
+
 			last := server.getServerOneHourAgo()											
 			changed = equalServers(last, server)
-			
 			if changed == true {								
-				servs = getUpdatedServers(url)
-				for _, s := range servs {
-					s.updateServer(dID)
-				}
-	
-				domain = getUpdatedDomain(url, servs)
-				domain.updateDomain()	
-			} 									
-		} 
+				domain.Servers_Changed = true
+			} 
+		}
 	} else {
 		domain.insertDomainsDB()	
 		u := domain.URL // get the url from the domain

@@ -2,19 +2,26 @@ package main
 
 import (		
 	_ "github.com/lib/pq"
+	"database/sql"
 )
 
 func existsDomain(url string) bool {
 	db := connDB()
 	var resp bool
+	var id, title string
 
-	rows, _ := db.Query(`SELECT * FROM domains WHERE url = $1`, url) 
-	defer rows.Close()
+	rows := db.QueryRow(`SELECT id, title FROM domains WHERE url = $1`, url).Scan(&id, &title)
+	//defer rows.Close()
 
-	if rows.Next() {
+	/* if rows != nil {
 		resp = true
 	} else {
 		resp = false
+	} */
+	if rows == sql.ErrNoRows {
+		resp = false
+	} else {
+		resp = true
 	}
 
 	defer db.Close()
@@ -25,8 +32,8 @@ func existsDomain(url string) bool {
 func (d *Domain) updateDomain() {
 	db := connDB()
 	
-	q, _ := db.Prepare(`UPDATE domains SET (servers_changed, ssl_grade, previous_ssl, logo, title, is_down, updated) = ($1, $2, $3, $4, $5, $6, $7)`)		
-	q.Exec(d.Servers_Changed, d.SSL, d.Previous_SSL, d.Logo, d.Title, d.Is_Down, d.Updated)
+	q, _ := db.Prepare(`UPDATE domains SET (servers_changed, ssl_grade, previous_ssl, logo, title, is_down, updated) = ($1, $2, $3, $4, $5, $6, $7) WHERE url = $8`)		
+	q.Exec(d.Servers_Changed, d.SSL, d.Previous_SSL, d.Logo, d.Title, d.Is_Down, d.Updated, d.URL)
 	
 	defer db.Close()
 }

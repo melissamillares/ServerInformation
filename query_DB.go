@@ -50,9 +50,9 @@ func (s *Server) getServerOneHourAgo() Server {
 func (s *Server) updateServer(domainID int) {
 	db := connDB()
 
-	q, _ := db.Prepare(`UPDATE servers SET (address, ssl_grade, country, owner, updated) = ($1, $2, $3, $4, $5) WHERE domainID = $6`)
+	q, _ := db.Prepare(`UPDATE servers SET (ssl_grade, country, owner, updated) = ($1, $2, $3, $4) WHERE domainID = $5`)
 		//s.Address, s.SSL_grade, s.Country, s.Owner, s.Updated, domainID)
-	q.Exec(s.Address, s.SSL_grade, s.Country, s.Owner, s.Updated, domainID)
+	q.Exec(s.SSL_grade, s.Country, s.Owner, s.Updated, domainID)
 
 	defer db.Close()
 }
