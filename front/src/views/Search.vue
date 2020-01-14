@@ -15,7 +15,7 @@
         >            
             <b-card-text>
                 <p>Enter the URL of the website you want to get the information from</p>
-                <b-form inline id="input-group">
+                <b-form inline id="input-group">                 
                     <b-form-input
                         id="input"
                         v-model="domain"
@@ -23,7 +23,7 @@
                         placeholder="https://google.com"                        
                         class="w-75 mb-2 mr-sm-2 mb-sm-0"
                     ></b-form-input>
-                    <b-button variant="info" v-on:click="saveDomain">
+                    <b-button variant="info" v-on:click="getDomain">
                         Search
                     </b-button>
                     <p>{{ domain }}</p>
@@ -45,16 +45,21 @@
         name: 'Search', 
         data() {
             return {
-                domain: '',
-                errors: [],
+                url: "",
+
+                errors: [],              
             }
         }, 
         methods: {
-            saveDomain: function() {
-                axios.post(`http://127.0.0.1:3000/domain`, {
-                    body: this.domain
+            getDomain: function() {
+                //document.write(this.domain)
+                axios.post(`http://127.0.0.1:3000/domain`, '"' + this.url + '"')
+                .then((result) => {
+                    document.write(result)
                 })
-               
+                .catch(e => {
+                    this.errors.push(e)
+                })
             }
         }
     };

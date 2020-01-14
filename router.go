@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi"	
 )
 
-func routes() http.Handler {
+func routes() http.Handler {	
 	r := chi.NewRouter()
 
 	r.Route("/domain", func(r chi.Router) { // first endpoint
@@ -23,7 +23,9 @@ func routes() http.Handler {
 }
 
 func addDomain(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")			
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+				
 	defer r.Body.Close()	
 	var domain *Domain
 	var url string
@@ -99,6 +101,7 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 }
 
 func listDomainServers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	dom := &Domain{}
 	d := dom.getDomain() 
 
@@ -108,6 +111,7 @@ func listDomainServers(w http.ResponseWriter, r *http.Request) {
 }
 
 func listAllDomains(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	dom := &Domain{}
 	d := dom.getDomains()
 	

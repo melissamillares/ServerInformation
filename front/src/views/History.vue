@@ -1,11 +1,6 @@
 <template>
   <div>    
-    <!--  
-    <ul v-if="domains && domains.length">
-        <li v-for="domain of domains" v-bind:key="domain">>            
-            <p>{{domain.body}}</p>
-        </li>
-    </ul> -->    
+       
     <div >
         <p >
 
@@ -45,9 +40,8 @@
             }
         },
         methods: {  
-            getAll(){
-                const baseURI = 'http://127.0.0.1:3000/getalldomains'
-                axios.get(baseURI)
+            getAll(){                
+                axios.get('http://127.0.0.1:3000/getalldomains')
                 .then((result) => {
                     this.domains = result.body
                 })
