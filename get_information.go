@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"	
-	"log"
-	"net"	
+	"log"	
+	"net"		
 	"net/url"
 	"net/http"
 	"io/ioutil"
@@ -53,8 +53,7 @@ func getIP(urlString string) []net.IP {
 func getInfoWhoIs(s string, ips []net.IP) string {
 	for _, ip := range ips {
 		result, err := whois.Whois(ip.String())		
-		if err != nil {			
-			//panic(err)
+		if err != nil {						
 			log.Fatal(err)
 		}
 		// split the result from whois by \n
@@ -113,6 +112,23 @@ func isServerDown(urlString string) bool {
 	return false
 }
 
+func compareOneHourAgo(serv1, serv2 Server) bool {
+	resp := false
+	//var server Server
+	//for _, serv := range servers {		
+		y1, m1, d1 := serv1.Created.Date()
+		serv1Date := string(y1) + string(m1) + string(d1)
+		y2, m2, d2 := serv2.Created.Date()
+		serv2Date := string(y2) + string(m2) + string(d2)
+
+		if serv2.Created.Hour() - serv1.Created.Hour() >= 1 || serv1Date != serv2Date || serv2.Updated.Hour() - serv1.Updated.Hour() >= 1 {
+			// if the difference in update is more than 1 hour			
+			resp = true								
+		} 
+	//}
+	return resp
+}
+
 // 
 func equalServers(s1, s2 Server) bool {
 	res := false
@@ -121,6 +137,5 @@ func equalServers(s1, s2 Server) bool {
 			res = true
 		}
 	//}
-
 	return res
 }

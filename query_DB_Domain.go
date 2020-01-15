@@ -47,6 +47,15 @@ func (d *Domain) updateServersChangedDomain() {
 	defer db.Close()
 }
 
+func (d *Domain) updateServersPrevious() {
+	db := connDB()
+	
+	q, _ := db.Prepare(`UPDATE domains SET (previous_ssl) = ($1) WHERE url = $2`)		
+	q.Exec(d.Previous_SSL, d.URL)
+	
+	defer db.Close()
+}
+
 func (d *Domain) getDomainID(host string) int {
 	db := connDB()
 	var id int
@@ -58,9 +67,23 @@ func (d *Domain) getDomainID(host string) int {
         rows.Scan(&d.ID)        
 		id = d.ID
 	}
-
 	defer db.Close()
 	return id
+}
+
+func (d *Domain) getDomainSSL(host string) string {
+	db := connDB()
+	var ssl string
+
+	rows, _ := db.Query(`SELECT ssl_grade FROM (SELECT * FROM domains ORDER BY created) WHERE url = $1`, host)	
+	defer rows.Close()
+
+	for rows.Next() {    
+        rows.Scan(&d.ID)        
+		ssl = d.SSL
+	}
+	defer db.Close()
+	return ssl
 }
 
 func (d *Domain) getDomain() Domain {	

@@ -17,7 +17,7 @@
             <b-card-text>                                      
                 <p>History of last domains consulted</p>
                 <p>{{ domains }}</p> 
-                <b-button v-on:click="getAll" variant="info">Clic</b-button>
+                <b-button v-on:click="getAll" variant="info">Consult</b-button>
             </b-card-text>  
         </b-card>        
     </b-container> 
@@ -40,10 +40,10 @@
             }
         },
         methods: {  
-            getAll(){                
+            getAll: function(){                
                 axios.get('http://127.0.0.1:3000/getalldomains')
                 .then((result) => {
-                    this.domains = result.body
+                    this.domains = result.data
                 })
                 .catch(e => {
                     this.errors.push(e)

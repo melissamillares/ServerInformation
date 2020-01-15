@@ -1,17 +1,15 @@
 package main
 
-import (	
-	"time"
+import (		
 	_ "github.com/lib/pq"
 )
 
-func (s *Server) getServerOneHourAgo() Server {
+func (s *Server) serversSameDomain() []Server {
 	db := connDB()
-	var server Server
+	//var server Server
 	var servers []Server
 
-	rows, _ := db.Query(`SELECT address, ssl_grade, country, owner, created, updated FROM servers WHERE domain = $1`, s.Domain)
-	
+	rows, _ := db.Query(`SELECT address, ssl_grade, country, owner, created, updated FROM servers WHERE domain = $1`, s.Domain)	
 	defer rows.Close()
 
 	for rows.Next() {    
@@ -25,26 +23,9 @@ func (s *Server) getServerOneHourAgo() Server {
 				Updated: s.Updated,
 		})		
 	}	
-	for _, serv := range servers {
-		current := time.Now()
-
-		y1, m1, d1 := serv.Created.Date()
-		serverDate := string(y1) + string(m1) + string(d1)
-		y2, m2, d2 := current.Date()
-		currentDate := string(y2) + string(m2) + string(d2)
-
-		if current.Hour() - serv.Created.Hour() >= 1 || serverDate != currentDate{
-			// if the difference in update is more than 1 hour
-			//|| current.Hour() - serv.Updated.Hour() >= 1 {
-			server = serv					
-		} /* else if serverDate != currentDate {
-			server = serv			
-		}	 */
-	}
-
 	defer db.Close()
 
-	return server
+	return servers
 }
 
 func (s *Server) updateServer(domainID int) {

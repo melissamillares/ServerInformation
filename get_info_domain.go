@@ -34,6 +34,17 @@ func getLowerGrade(ssl []string) string {
 	return ssl[last_index]
 }
 
+func getPreviousSSL(r string) string {
+	var lowerSSL string
+
+	host := hostName(r)
+	IPs := getIP(host) // array with the server IPs							
+	ssl := getSSLGrade(host, len(IPs)) // SSL grade				
+	lowerSSL = getLowerGrade(ssl) // lower SSL grade
+
+	return lowerSSL
+}
+
 func getLogo(urlString string) string {	
 	var resultLogo string	
 	resp, err := http.Get(urlString)
@@ -97,13 +108,14 @@ func getLogo(urlString string) string {
 }
 
 // Reads HTML file and return the title 
-func getTitle(urlString string) string {
+func getTitle(urlString string) (string, bool) {	
+	isdown := false
 	t := "title"
 	var resultTitle string
 	resp, err := http.Get(urlString)
 
 	if err != nil {		
-		log.Fatal(err)
+		isdown = true
 	}
 	defer resp.Body.Close()
 	//create a new tokenizer over the response body
@@ -129,5 +141,5 @@ func getTitle(urlString string) string {
 			}  						
 		}	
 	}
-	return resultTitle
+	return resultTitle, isdown
 }

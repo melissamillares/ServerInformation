@@ -29,7 +29,7 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()	
 	var domain *Domain
 	var url string
-	var changed bool
+	var equal bool
 	servers := []Server{}	
 	// obtain the url value in the request body (e.g. url="https://truora.com")
 	err := json.NewDecoder(r.Body).Decode(&url)
@@ -40,28 +40,36 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 
 	servers = getServers(url) // get the information to be saved in database
 	domain = getDomain(url, servers) // get the information to be saved in database	
-
+	u := domain.URL // get the host from the domain
+	
+	servs := servers // save the servers in a different variable
+	pssl := domain.getDomainSSL(u) // obtain the previous ssl grade from the last domain saved
 	// check if it exists before inserting in database
 	exists := existsDomain(hostName(url))
-	if exists == true {
+	if exists == true {	
 		//var servs []Server
 		servers = getUpdatedServers(url)
-		domain = getUpdatedDomain(url, servers)
+		domain = getUpdatedDomain(url, servers)		
 		domain.updateDomain()
 
-		u := domain.URL // get the host from the domain
+		
 		dID := domain.getDomainID(u) // get the id from the domain
 
-		for _, server := range servers {
-			server.DomainID = dID
-			server.updateServer(dID)
+		for i, server := range servers {
+			lasts := servs[i].serversSameDomain()	
 
-			last := server.getServerOneHourAgo()											
-			changed = equalServers(last, server)
-			if changed == true {								
-				domain.Servers_Changed = true
-				domain.updateServersChangedDomain()
-			} 
+			if compareOneHourAgo(server, lasts[i]){
+				equal = equalServers(lasts[i], server)
+				if equal == false {								
+					domain.Servers_Changed = true					
+					domain.updateServersChangedDomain()
+				}
+				domain.Previous_SSL = pssl
+				domain.updateServersPrevious()
+			}
+
+			server.DomainID = dID
+			server.updateServer(dID)																 
 		}
 	} else {
 		domain.insertDomainsDB()	
@@ -73,28 +81,6 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 			server.insertServersDB()
 		}
 	}  
-	/*domain.insertDomainsDB()	
-	u := domain.URL // get the url from the domain
-	dID := domain.getDomainID(u) // get the id from the domain 
-
-	for _, server := range servers {
-		var servs []Server	
-		server.DomainID = dID		
-		server.insertServersDB()
-		
-		last := server.getServerOneHourAgo()											
-		changed = equalServers(last, server)
-		
-		if changed == true {								
-			servs = getUpdatedServers(url)
-			for _, s := range servs {
-				s.updateServer(dID)
-			}
-
-			domain = getUpdatedDomain(url, servs)
-			domain.updateDomain()	
-		} 									
-	}  */
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(domain)	

@@ -70,11 +70,11 @@ func getDomain(r string, servers []Server) *Domain {
 	if outputURL {
 		host := hostName(r)
 		IPs := getIP(host) // array with the server IPs			
-		title := getTitle(r) // domain html title	
+		title, serverDown := getTitle(r) // domain html title	
 		logo := getLogo(r) // html logo
 		ssl := getSSLGrade(host, len(IPs)) // SSL grade		
 		lowerSSL := getLowerGrade(ssl) // lower SSL grade
-		serverDown := isServerDown(r)		
+		//serverDown := isServerDown(r)		
 
 		domain = Domain{
 			//ID: ,
@@ -82,7 +82,7 @@ func getDomain(r string, servers []Server) *Domain {
 			Servers: servers,
 			Servers_Changed: false,
 			SSL: lowerSSL,
-			Previous_SSL: lowerSSL,
+			Previous_SSL: "",
 			Logo: logo,
 			Title: title,
 			Is_Down: serverDown,
@@ -102,17 +102,17 @@ func getUpdatedDomain(r string, servers []Server) *Domain {
 		host := hostName(r)
 		IPs := getIP(host) // array with the server IPs							
 		ssl := getSSLGrade(host, len(IPs)) // SSL grade	
-		title := getTitle(r) // domain html title	
+		title, serverDown := getTitle(r) // domain html title	
 		logo := getLogo(r) // html logo	
 		lowerSSL := getLowerGrade(ssl) // lower SSL grade
-		serverDown := isServerDown(r)			
+		//serverDown := isServerDown(r)			
 
 		domain = Domain{
 			URL: host,
 			Servers: servers,
 			Servers_Changed: false,
 			SSL: lowerSSL,
-			Previous_SSL: lowerSSL,
+			//Previous_SSL: lowerSSL,
 			Logo: logo,
 			Title: title,
 			Is_Down: serverDown,
@@ -122,4 +122,3 @@ func getUpdatedDomain(r string, servers []Server) *Domain {
 
 	return &domain
 }
-
