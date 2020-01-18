@@ -12,14 +12,14 @@ import (
 )
 
 // verify if the string is a URL
-func isURL(urlString string) bool {
+func isURL(urlString string) (bool, error) {
 	_, err := url.ParseRequestURI(urlString)
 
 	if err != nil {			
-		//panic(err)					
-		return false
+		//panic(err)							
+		return false, err
 	} else {	
-		return true
+		return true, nil
 	}		
 }
 
@@ -76,25 +76,22 @@ func getSSLGrade(host string, length int) []string {
 	resp, err := http.Get(u)
 	sslgrades := make([]string, length) // array with the length from the IPs array
 
-	if err != nil {		
-		log.Fatal(err)
-	}
+	if err == nil {				
+		defer resp.Body.Close()
 
-	defer resp.Body.Close()
+		body, e := ioutil.ReadAll(resp.Body)
 
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {		
-		log.Fatal(err)
-	}	
-	splitResult := strings.Split(string(body), ",")		
-	for _, val := range splitResult {		
-		if strings.Contains(val, "grade") {
-			ssl := strings.Trim(val, "\"grade\":")
-			for i := 0; i < length; i++ {
-				sslgrades[i] = ssl
-			}							
-			return sslgrades
+		if e == nil {						
+			splitResult := strings.Split(string(body), ",")		
+			for _, val := range splitResult {		
+				if strings.Contains(val, "grade") {
+					ssl := strings.Trim(val, "\"grade\":")
+					for i := 0; i < length; i++ {
+						sslgrades[i] = ssl
+					}							
+					return sslgrades
+				}
+			}
 		}
 	}
 

@@ -92,13 +92,14 @@ func (d *Domain) getDomain() Domain {
 	domain := Domain{}
 	var s []Server
 
-	rows, _ := db.Query(`SELECT id, servers_changed, ssl_grade, previous_ssl, logo, title, is_down FROM domains`)	    	
+	rows, _ := db.Query(`SELECT id, url, servers_changed, ssl_grade, previous_ssl, logo, title, is_down FROM domains`)	    	
 	defer rows.Close()
 		
     for rows.Next() {    
-        rows.Scan(&d.ID, &d.Servers_Changed, &d.SSL, &d.Previous_SSL, &d.Logo, &d.Title, &d.Is_Down)        
+        rows.Scan(&d.ID, &d.URL, &d.Servers_Changed, &d.SSL, &d.Previous_SSL, &d.Logo, &d.Title, &d.Is_Down)        
 		domain = Domain {
 				ID: d.ID,
+				URL: d.URL,
 				Servers: s,
 				Servers_Changed: d.Servers_Changed,
 				SSL: d.SSL,
@@ -123,7 +124,7 @@ func (d *Domain) getDomains() []Domain {
 	domain := Domain{}
 	domains := []Domain{}	
 
-	rows, err := db.Query(`SELECT id, servers_changed, ssl_grade, previous_ssl, logo, title, is_down 
+	rows, err := db.Query(`SELECT id, url, servers_changed, ssl_grade, previous_ssl, logo, title, is_down 
 		FROM domains ORDER BY created DESC`)
     if err != nil {
 		return domains
@@ -131,9 +132,10 @@ func (d *Domain) getDomains() []Domain {
 	defer rows.Close()
 		
     for rows.Next() {    
-		rows.Scan(&d.ID, &d.Servers_Changed, &d.SSL, &d.Previous_SSL, &d.Logo, &d.Title, &d.Is_Down) 
+		rows.Scan(&d.ID, &d.URL, &d.Servers_Changed, &d.SSL, &d.Previous_SSL, &d.Logo, &d.Title, &d.Is_Down) 
 		domain = Domain {
 			ID: d.ID,
+			URL: d.URL,
 			Servers: servers,
 			Servers_Changed: d.Servers_Changed,
 			SSL: d.SSL,

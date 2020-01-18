@@ -25,8 +25,9 @@ func routes() http.Handler {
 func addDomain(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-				
-	defer r.Body.Close()	
+	r.Header.Set("Connection", "close")				
+	defer r.Body.Close()
+
 	var domain *Domain
 	var url string
 	var equal bool
@@ -38,52 +39,56 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
         return
 	}
 
-	servers = getServers(url) // get the information to be saved in database
-	domain = getDomain(url, servers) // get the information to be saved in database	
-	u := domain.URL // get the host from the domain
-	
-	servs := servers // save the servers in a different variable
-	pssl := domain.getDomainSSL(u) // obtain the previous ssl grade from the last domain saved
-	// check if it exists before inserting in database
-	exists := existsDomain(hostName(url))
-	if exists == true {	
-		//var servs []Server
-		servers = getUpdatedServers(url)
-		domain = getUpdatedDomain(url, servers)		
-		domain.updateDomain()
-
+	_, e := isURL(url)
+	if e == nil {
+		servers = getServers(url) // get the information to be saved in database
+		domain = getDomain(url, servers) // get the information to be saved in database	
+		u := domain.URL // get the host from the domain
 		
-		dID := domain.getDomainID(u) // get the id from the domain
+		servs := servers // save the servers in a different variable
+		pssl := domain.getDomainSSL(u) // obtain the previous ssl grade from the last domain saved
+		// check if it exists before inserting in database
+		exists := existsDomain(hostName(url))
+		if exists == true {	
+			//var servs []Server
+			servers = getUpdatedServers(url)
+			domain = getUpdatedDomain(url, servers)		
+			domain.updateDomain()		
+			dID := domain.getDomainID(u) // get the id from the domain
 
-		for i, server := range servers {
-			lasts := servs[i].serversSameDomain()	
+			for i, server := range servers {
+				lasts := servs[i].serversSameDomain()	
 
-			if compareOneHourAgo(server, lasts[i]){
-				equal = equalServers(lasts[i], server)
-				if equal == false {								
-					domain.Servers_Changed = true					
-					domain.updateServersChangedDomain()
+				if compareOneHourAgo(server, lasts[i]){
+					equal = equalServers(lasts[i], server)
+					if equal == false {								
+						domain.Servers_Changed = true					
+						domain.updateServersChangedDomain()
+					}
+					domain.Previous_SSL = pssl
+					domain.updateServersPrevious()
 				}
-				domain.Previous_SSL = pssl
-				domain.updateServersPrevious()
+
+				server.DomainID = dID
+				server.updateServer(dID)																 
 			}
+		} else {
+			domain.insertDomainsDB()	
+			u := domain.URL // get the url from the domain
+			dID := domain.getDomainID(u) // get the id from the domain
 
-			server.DomainID = dID
-			server.updateServer(dID)																 
-		}
-	} else {
-		domain.insertDomainsDB()	
-		u := domain.URL // get the url from the domain
-		dID := domain.getDomainID(u) // get the id from the domain
+			for _, server := range servers {			
+				server.DomainID = dID		
+				server.insertServersDB()
+			}
+		}  
 
-		for _, server := range servers {			
-			server.DomainID = dID		
-			server.insertServersDB()
-		}
-	}  
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(domain)	
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(domain)
+	} else if e != nil {
+		json.NewEncoder(w).Encode("error")
+		return		
+	}		
 }
 
 func listDomainServers(w http.ResponseWriter, r *http.Request) {
@@ -99,10 +104,18 @@ func listDomainServers(w http.ResponseWriter, r *http.Request) {
 func listAllDomains(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	dom := &Domain{}
-	d := dom.getDomains()
+	item := []Item{}
+	items := Items{}
+	domains := dom.getDomains()
 	
-	items := Items{		
-		Domains: d,
+	for _, domain := range domains {
+		item = append(item, Item{	
+			URL: domain.URL,
+			Domain: domain,
+		})
+		items = Items{
+			Items: item,
+		}
 	}
 
 	enc := json.NewEncoder(w)

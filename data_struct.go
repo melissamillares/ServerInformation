@@ -21,7 +21,7 @@ type Server struct {
 // struct with the server information
 type Domain struct {
 	ID int 					`json:"-"` 
-	URL string				`json:"-"`
+	URL string				`json:"url"`
 	Servers []Server		`json:"servers"`
 	Servers_Changed bool    `json:"servers_changed"`
 	SSL string				`json:"ssl_grade"`
@@ -34,7 +34,13 @@ type Domain struct {
 }
 
 // struct with a Domain array
+type Item struct {	
+	URL string			`json:"url"`	
+	Domain Domain 		`json:"info"`
+	// sacar los datos por separado en lugar de poner todo el domain	
+}
+
 type Items struct {		
-	Domains []Domain `json:"items"`
-	// sacar los datos por separado en lugar de poner todo el domain
+	Items []Item 		`json:"items"`
+	// sacar los datos por separado en lugar de poner todo el domain	
 }

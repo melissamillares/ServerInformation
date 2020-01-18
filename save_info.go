@@ -4,8 +4,8 @@ import (
 	"time"
 )
 
-func getServers(r string) []Server {
-	outputURL := isURL(r)
+func getServers(r string) []Server {	
+	outputURL, _ := isURL(r)
 	var server Server
 	var servers []Server
 
@@ -31,12 +31,11 @@ func getServers(r string) []Server {
 			servers = append(servers, server)
 		}
 	}
-
 	return servers
 }
 
-func getUpdatedServers(r string) []Server {
-	outputURL := isURL(r)
+func getUpdatedServers(r string) []Server {	
+	outputURL, _ := isURL(r)
 	var server Server
 	var servers []Server
 
@@ -59,12 +58,11 @@ func getUpdatedServers(r string) []Server {
 			servers = append(servers, server)
 		}
 	}
-
 	return servers
 }
 
-func getDomain(r string, servers []Server) *Domain {	
-	outputURL := isURL(r)
+func getDomain(r string, servers []Server) *Domain {
+	outputURL, _ := isURL(r)		
 	domain := Domain{}
 
 	if outputURL {
@@ -88,16 +86,15 @@ func getDomain(r string, servers []Server) *Domain {
 			Is_Down: serverDown,
 			Created: time.Now(),
 			Updated: time.Time{}, // null time
-		}
-	}	
-
+		}	
+	}
 	return &domain
 }
 
-func getUpdatedDomain(r string, servers []Server) *Domain {
-	outputURL := isURL(r)
+func getUpdatedDomain(r string, servers []Server) *Domain {	
+	outputURL, _ := isURL(r)
 	domain := Domain{}
-
+	
 	if outputURL {
 		host := hostName(r)
 		IPs := getIP(host) // array with the server IPs							
@@ -117,8 +114,7 @@ func getUpdatedDomain(r string, servers []Server) *Domain {
 			Title: title,
 			Is_Down: serverDown,
 			Updated: time.Now(),
-		}
-	}	
-
+		}	
+	}
 	return &domain
 }

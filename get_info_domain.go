@@ -1,7 +1,6 @@
 package main
 
-import (	
-	"log"
+import (		
 	"net/http"
 	"golang.org/x/net/html"
 	"io"
@@ -47,63 +46,65 @@ func getPreviousSSL(r string) string {
 
 func getLogo(urlString string) string {	
 	var resultLogo string	
-	resp, err := http.Get(urlString)
+	resp, err := http.Get(urlString)	
+
 	if err != nil {		
-		log.Fatal(err)
-	}	
-	defer resp.Body.Close()
+		return ""
+	} else {
+		defer resp.Body.Close()
 
-	body, _ := ioutil.ReadAll(resp.Body)	
-	split := strings.Split(string(body), "<")
+		body, _ := ioutil.ReadAll(resp.Body)	
+		split := strings.Split(string(body), "<")
 
-	for _, val := range split {		
-		if strings.Contains(val, "rel=\"fluid-icon\"") {
-			val = strings.Trim(val, ">")
-			splitResult := strings.Split(val, " ")
-			for _, v := range splitResult {					
-				if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {
-					logo := strings.Trim(v, "href=")											
-					resultLogo = logo
+		for _, val := range split {		
+			if strings.Contains(val, "rel=\"fluid-icon\"") {
+				val = strings.Trim(val, ">")
+				splitResult := strings.Split(val, " ")
+				for _, v := range splitResult {					
+					if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {
+						logo := strings.Trim(v, "href=")											
+						resultLogo = logo
+					}
 				}
+			} else if strings.Contains(val, "rel=\"shortcut icon\"") {
+				val = strings.Trim(val, ">")
+				splitResult := strings.Split(val, " ")
+				for _, v := range splitResult {					
+					if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {						
+						logo := strings.Trim(v, "href=")											
+						resultLogo = logo				
+					}				
+				}			
+			} else if strings.Contains(val, "rel=\"apple-touch-icon\"") {
+				val = strings.Trim(val, ">")
+				splitResult := strings.Split(val, " ")
+				for _, v := range splitResult {					
+					if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {						
+						logo := strings.Trim(v, "href=")											
+						resultLogo = logo				
+					}				
+				}			
+			} else if strings.Contains(val, "rel=\"icon\"") {
+				val = strings.Trim(val, ">")
+				splitResult := strings.Split(val, " ")
+				for _, v := range splitResult {					
+					if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {						
+						logo := strings.Trim(v, "href=")											
+						resultLogo = logo				
+					}				
+				}			
+			} else if strings.Contains(val, "rel=\"mask-icon\"") {
+				val = strings.Trim(val, ">")
+				splitResult := strings.Split(val, " ")
+				for _, v := range splitResult {					
+					if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {						
+						logo := strings.Trim(v, "href=")											
+						resultLogo = logo				
+					}				
+				}			
 			}
-		} else if strings.Contains(val, "rel=\"shortcut icon\"") {
-			val = strings.Trim(val, ">")
-			splitResult := strings.Split(val, " ")
-			for _, v := range splitResult {					
-				if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {						
-					logo := strings.Trim(v, "href=")											
-					resultLogo = logo				
-				}				
-			}			
-		} else if strings.Contains(val, "rel=\"apple-touch-icon\"") {
-			val = strings.Trim(val, ">")
-			splitResult := strings.Split(val, " ")
-			for _, v := range splitResult {					
-				if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {						
-					logo := strings.Trim(v, "href=")											
-					resultLogo = logo				
-				}				
-			}			
-		} else if strings.Contains(val, "rel=\"icon\"") {
-			val = strings.Trim(val, ">")
-			splitResult := strings.Split(val, " ")
-			for _, v := range splitResult {					
-				if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {						
-					logo := strings.Trim(v, "href=")											
-					resultLogo = logo				
-				}				
-			}			
-		} else if strings.Contains(val, "rel=\"mask-icon\"") {
-			val = strings.Trim(val, ">")
-			splitResult := strings.Split(val, " ")
-			for _, v := range splitResult {					
-				if strings.Contains(v, ".png") || strings.Contains(v, ".jpg") || strings.Contains(v, ".svg") || strings.Contains(v, ".ico") {						
-					logo := strings.Trim(v, "href=")											
-					resultLogo = logo				
-				}				
-			}			
 		}
-	}	
+	}			
 	return resultLogo
 }
 
@@ -115,31 +116,32 @@ func getTitle(urlString string) (string, bool) {
 	resp, err := http.Get(urlString)
 
 	if err != nil {		
-		isdown = true
-	}
-	defer resp.Body.Close()
-	//create a new tokenizer over the response body
-	tokenizer := html.NewTokenizerFragment(resp.Body, "head")
+		isdown = true		
+	} else {
+		defer resp.Body.Close()
+		//create a new tokenizer over the response body
+		tokenizer := html.NewTokenizerFragment(resp.Body, "head")
 
-	for {
-		tokenType := tokenizer.Next() // get the token type
-		
-		if tokenType == html.ErrorToken {
-			err := tokenizer.Err()			
-			if err == io.EOF {				
-				break //end of the file
-			}			
-		}				
-		if tokenType == html.StartTagToken {			
-			token := tokenizer.Token()	// get the token	
-			// if the name of the element is "title"
-			if t == token.Data {				
-				tokenType = tokenizer.Next() 	// get the type of the next token			
-				//get the page title
-				resultTitle = tokenizer.Token().Data
-				break																		
-			}  						
-		}	
-	}
+		for {
+			tokenType := tokenizer.Next() // get the token type
+			
+			if tokenType == html.ErrorToken {
+				err := tokenizer.Err()			
+				if err == io.EOF {				
+					break //end of the file
+				}			
+			}				
+			if tokenType == html.StartTagToken {			
+				token := tokenizer.Token()	// get the token	
+				// if the name of the element is "title"
+				if t == token.Data {				
+					tokenType = tokenizer.Next() 	// get the type of the next token			
+					//get the page title
+					resultTitle = tokenizer.Token().Data
+					break																		
+				}  						
+			}	
+		}
+	}	
 	return resultTitle, isdown
 }
