@@ -5,76 +5,82 @@
         <p >
 
         </p>
-    </div>       
-    <b-container fluid>         
+    </div>          
+    <b-container fluid>               
         <b-card  
-            overlay
-            img-src="https://cdn.pixabay.com/photo/2016/03/26/13/09/notebook-1280538_960_720.jpg" 
+            overlay            
+            img-src="https://picsum.photos/900/125/?image=3"
+            img-top
             text-variant="white"                                              
-            style="max-width: 100rem;"            
+            style="max-width: 100rem;"           
         >  
             <h1>History</h1>
             <b-card-text>                                      
                 <p>History of last domains consulted</p>                
                 <b-button v-on:click="getAll" variant="info">Consult</b-button>
             </b-card-text> 
+            <div>
+               <br>
+            </div>            
+            <b-card-text>
+                <b-container fluid border-variant="secondary">                                                                                                      
+                    <div class="mt-3" v-for="d in domains" :key="d.url">
+                        <div id="results">                                                      
+                            <b-table-simple hover small caption-top responsive>
+                                <b-thead class="text-center text-dark">
+                                    <b-tr>
+                                        <b-th colspan="6" class="text-center text-light" variant="dark">{{ d.url }}</b-th>        
+                                    </b-tr>
+                                    <b-tr>
+                                        <b-th>Servers Changed</b-th>
+                                        <b-th>SSL Grade</b-th>
+                                        <b-th>Previous SSL</b-th>
+                                        <b-th>Logo</b-th>
+                                        <b-th>Title</b-th>
+                                        <b-th>Is Down</b-th>                                    
+                                    </b-tr>
+                                </b-thead>
+                                <b-tbody class="text-center text-dark">
+                                    <b-tr>
+                                        <b-td>{{ d.info.changed }}</b-td>
+                                        <b-td>{{ d.info.ssl_grade }}</b-td>
+                                        <b-td>{{ d.info.previous }}</b-td>
+                                        <b-td>{{ d.info.logo }}</b-td>
+                                        <b-td>{{ d.info.title }}</b-td>
+                                        <b-td>{{ d.info.down }}</b-td>                                
+                                    </b-tr>
+                                </b-tbody>
+                            </b-table-simple> 
+                        
+                            <b-table-simple hover small caption-top responsive>
+                                <b-thead class="text-center text-dark">
+                                    <b-tr>
+                                        <b-th colspan="6" variant="info">
+                                            Servers
+                                        </b-th>        
+                                    </b-tr>
+                                    <b-tr>
+                                        <b-th>Address</b-th>
+                                        <b-th>SSL Grade</b-th>
+                                        <b-th>Country</b-th>
+                                        <b-th>Owner</b-th>                                   
+                                    </b-tr>
+                                </b-thead>
+                                <b-tbody class="text-center text-dark" v-for="ss in d.info.servers" :key="ss">
+                                    <b-tr>
+                                        <b-td>{{ ss.address }}</b-td>
+                                        <b-td>{{ ss.ssl_grade }}</b-td>
+                                        <b-td>{{ ss.country }}</b-td>
+                                        <b-td>{{ ss.owner }}</b-td>                                                              
+                                    </b-tr>
+                                </b-tbody>
+                            </b-table-simple>                                                                                                                                                          
+                        </div>                                                                                                                              
+                    </div>                                                                                                                                                                                                                                                               
+                </b-container>                                     
+            </b-card-text>
 
-            <b-container fluid>                                                                                       
-                <div class="mt-3" v-for="domain in domains" :key="domain.url"> 
-                    <div >  
-                        <p>{{domain.url}}</p>                                                                                                
-                    </div>                    
-                    <b-button block href="#" v-b-toggle.accordion-1 variant="dark">Domain Info</b-button>
-                    <b-collapse id="accordion-1" visible accordion="my-accordion" role="tabpanel">                                                                  
-                        <b-table-simple striped hover responsive>                        
-                            <b-tbody>  
-                                <b-tr>
-                                    <b-th class="text-right" variant="dark" colspan="1">URL</b-th>
-                                    <b-td class="text-left text-light" text-light colspan="5">{{ domain.url }}</b-td>
-                                </b-tr>                                    
-                                <b-tr>
-                                    <b-th class="text-right" variant="dark" colspan="1">Servers Changed</b-th> 
-                                    <b-td class="text-left text-light" colspan="5">{{ domain.changed }}</b-td>
-                                </b-tr>
-                                <b-tr>
-                                    <b-th class="text-right" variant="dark" colspan="1">SSL Grade</b-th> 
-                                    <b-td class="text-left text-light" colspan="5">{{ domain.ssl_grade }}</b-td>
-                                </b-tr>
-                                <b-tr>
-                                    <b-th class="text-right" variant="dark" colspan="1">Previous SSL</b-th> 
-                                    <b-td class="text-left text-light" colspan="5">{{ domain.previous }}</b-td>
-                                </b-tr>
-                                <b-tr> 
-                                    <b-th class="text-right" variant="dark" colspan="1">Logo</b-th> 
-                                    <b-td class="text-left text-light" colspan="5">{{ domain.logo }}</b-td>
-                                </b-tr>                           
-                                <b-tr> 
-                                    <b-th class="text-right" variant="dark" colspan="1">Title</b-th> 
-                                    <b-td class="text-left text-light" colspan="5">{{ domain.title }}</b-td>
-                                </b-tr> 
-                                <b-tr>
-                                    <b-th class="text-right" variant="dark" colspan="1">Is Down</b-th>     
-                                    <b-td class="text-left text-light" colspan="5">{{ domain.down }}</b-td>
-                                </b-tr>                                                                                                                                                                                                  
-                            </b-tbody>
-                        </b-table-simple>  
-                    </b-collapse> 
-                </div> 
-                <div>
-                    <!-- Table for the servers -->
-                    <b-button block href="#" v-b-toggle.accordion-2 variant="dark">Servers</b-button>
-                    <b-collapse id="accordion-2" visible accordion="my-accordion" role="tabpanel">
-                        <b-table class="text-light" variant="dark" hover :items="servers"></b-table>
-                    </b-collapse> 
-                </div>                    
-            </b-container>            
-            <b-pagination                
-                v-model="currentPage"  
-                :total-rows="rows"              
-                :per-page=1
-                aria-controls="my-table"                
-            ></b-pagination>  
-        </b-card>             
+        </b-card>                            
     </b-container> 
     <div >
         <p >
@@ -91,27 +97,11 @@
         data() {
             return {
                 currentPage: 1,
-                rows: 0,
-                domain: {  
-                    url: '',                                      
-                    changed: '',
-                    ssl_grade: '',
-                    title: '',
-                    logo: '',
-                    previous: '',
-                    down: '',                    
-                },
-                domains: [],
-                servers: [{
-                    address: '',
-                    ssl_grade: '',
-                    country: '',
-                    owner: '',
-                }],
+                rows: 0,                               
                 errors: [],
                 error: false,
             }
-        },
+        },        
         methods: {  
             getAll: function(){                              
                 axios.get('http://127.0.0.1:3000/getalldomains')                                   
@@ -120,29 +110,26 @@
                         this.error = true
                     } else {
                         this.rows = response.data['items'].length
-                        for (var i = 0; i < this.rows; i++) {                            
-                            // guardar esta info en domain, y luego agregar a domains
-                            this.error = false
-                            this.servers = response.data.items[i].info.servers
-                            this.domain.url = response.data.items[i].url
-                            this.domain.changed = response.data.items[i].info.servers_changed
-                            this.domain.ssl_grade = response.data.items[i].info.ssl_grade
-                            this.domain.title = response.data.items[i].info.title
-                            this.domain.logo = response.data.items[i].info.logo
-                            this.domain.previous = response.data.items[i].info.previous_ssl_grade
-                            this.domain.down = response.data.items[i].info.is_down 
+                        this.error = false        
 
-                            //this.$set(this.domain, this.domain.url, domainUrl)
-
-                            this.domains.push(this.domain)                             
-                            //document.write(this.domains[i].url, "* ", i)                                                                                                                                                                                     
-                        }                                  
+                        for (var i = 0; i < this.rows; i++) {
+                            this.$store.commit('setDomains', response.data.items[i])
+                            //this.$store.commit('setDomains', response.data.items[i].info.servers)
+                        }                                 
                     }                   
                 })                                 
                 .catch(e => {
                     this.errors.push(e)
                 })                                                    
             }                        
+        },
+        computed: {
+            domains() {
+                return this.$store.state.domains;
+            },
+            servers() {
+                return this.$store.state.servers;
+            }
         }         
     }      
 </script>

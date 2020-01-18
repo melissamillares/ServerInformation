@@ -46,7 +46,7 @@
                     </div>
                 </b-container>
 
-                <b-container fluid v-if="urlEmpty == true">
+                <b-container fluid>
                     <div class="mt-3">
                         <b-button block href="#" v-b-toggle.accordion-1 variant="dark">Domain Info</b-button>
                         <b-collapse id="accordion-1" visible accordion="my-accordion" role="tabpanel">                    
