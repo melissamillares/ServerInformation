@@ -33,11 +33,13 @@ type Domain struct {
 	Updated time.Time `json:"-"`
 }
 
+//
 type Item struct {	
 	URL string `json:"url"`	
 	Domain Domain `json:"info"`		
 }
 
+//
 type Items struct {		
 	Items []Item `json:"items"`		
 }
