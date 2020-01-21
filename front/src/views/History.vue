@@ -13,17 +13,13 @@
             <h1>History</h1>
             <b-card-text>                                      
                 <p>History of last domains consulted</p>                
-                <b-button v-on:click="getAll" variant="info">Consult</b-button>
+                <b-button v-on:click="getAll" variant="info">Consult</b-button>                
             </b-card-text> 
             <div>
                <br>
             </div>            
             <b-card-text>
-                <b-container fluid border-variant="secondary">                                   
-                    <div v-if="!rows" class="w-25 bg-info text-light">                    
-                        <p class="mt-1">There are no results</p>
-                    </div>                                       
-
+                <b-container fluid border-variant="secondary">                                                                                                                 
                     <b-list-group v-if="rows" class="text-center text-dark" id="result">                                            
                         <b-list-group-item>
                             <b-table-simple hover small caption-top responsive>
