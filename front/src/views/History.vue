@@ -1,11 +1,7 @@
 <template>
   <div>    
        
-    <div >
-        <p >
-
-        </p>
-    </div>          
+    <div ><br></div>          
     <b-container fluid>               
         <b-card  
             overlay            
@@ -23,7 +19,11 @@
                <br>
             </div>            
             <b-card-text>
-                <b-container fluid border-variant="secondary">   
+                <b-container fluid border-variant="secondary">                                   
+                    <div v-if="!rows" class="w-25 bg-info text-light">                    
+                        <p class="mt-1">There are no results</p>
+                    </div>                                       
+
                     <b-list-group v-if="rows" class="text-center text-dark" id="result">                                            
                         <b-list-group-item>
                             <b-table-simple hover small caption-top responsive>
@@ -141,18 +141,12 @@
                         aria-controls="result"
                         align="center"                        
                     ></b-pagination>                                                                                                                                                                                                                                                           
-                </b-container> 
-                
-                                   
+                </b-container>                                                
             </b-card-text>
 
         </b-card>                            
     </b-container> 
-    <div >
-        <p >
-
-        </p>
-    </div>
+    <div ><br></div>
   </div>      
 </template>
 
@@ -162,11 +156,10 @@
         name: 'History', 
         data() {
             return {
-                currentPage: 1,
+                currentPage: 0,
                 rows: 0, 
                 perPage: 1,                             
-                errors: [],
-                error: false,
+                errors: [],                
             }
         },        
         methods: {  

@@ -1,10 +1,6 @@
 <template>
   <div > 
-    <div >
-        <p >
-
-        </p>
-    </div>       
+    <div ><br></div>       
     <b-container fluid>         
         <b-card  
             overlay
@@ -37,15 +33,15 @@
                     </b-form>
                 </b-container>
 
-                <b-container fluid>
-                    <div v-if="urlEmpty" class="w-25 bg-info text-dark">                    
-                        <p class="mt-1"> ⬆️ Attention! This field cannot be empty</p>
+                <b-container fluid>                
+                    <div v-if="urlEmpty" class="w-25 bg-info text-light">                    
+                        <p class="mt-1"> ⬆️ Warning! This field cannot be empty</p>
                     </div>
-                    <div v-if="error" class="w-25 bg-info text-dark">
-                        <p class="mt-1"> ⬆️ Attention! There is an error in the URL</p>                    
-                    </div>
-                </b-container>
-            </b-card-text>
+                    <div v-if="error" class="w-25 bg-info text-light">
+                        <p class="mt-1"> ⬆️ Warning! There is an error in the URL</p>                    
+                    </div>                                        
+                </b-container>                             
+            </b-card-text>            
 
             <b-card-text>
                 <div><br></div>
@@ -87,8 +83,7 @@
                                 </b-tbody>
                             </b-table-simple> 
                         </b-collapse> 
-                    </div>
-
+                    </div>                    
                     <div>
                         <!-- Table for the servers -->
                         <b-button block href="#" v-b-toggle.accordion-2 variant="dark">Servers</b-button>
@@ -129,13 +124,22 @@
             }
         }, 
         methods: {            
-            getDomain: function(){                                
+            getDomain: function(){  
+                this.servers = [{}]
+                this.changed = ''
+                this.ssl_grade = ''
+                this.title = ''
+                this.logo = ''
+                this.previous = ''
+                this.down = ''  
+
                 if (this.url != "") {
                     this.urlEmpty = false
                     axios.post(`http://127.0.0.1:3000/domain`, '"' + this.url + '"')                      
                     .then(response => {
                         if (response.data == "error"){
                             this.error = true
+                            this.url = ''
                         } else {
                             this.error = false
                             this.servers = response.data.servers
@@ -151,7 +155,7 @@
                         this.errors.push(e)
                     })                    
                 } else {
-                    this.urlEmpty = true  
+                    this.urlEmpty = true                     
                     this.error = false                                       
                 }                
             }

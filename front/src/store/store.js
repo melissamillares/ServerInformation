@@ -6,17 +6,12 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
     state: {    
         domains: [],
-        servers: [],
-    }, 
-    getters: {
-        //getDomains: state => {
-            //obtener los dominios y servidores
-        //}
-    },
+        //servers: [],
+    },     
     mutations: {
         setDomains (state, domain) {                        
             state.domains.push(domain)
-            state.servers.push(domain.info.servers)            
+            //state.servers.push(domain.info.servers)            
         },        
     }   
 })
