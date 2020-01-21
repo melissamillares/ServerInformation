@@ -23,9 +23,64 @@
                <br>
             </div>            
             <b-card-text>
-                <b-container fluid border-variant="secondary">                                                                                                      
-                    <div class="mt-3" v-for="d in domains" :key="d.url">
-                        <div id="results">                                                      
+                <b-container fluid border-variant="secondary">   
+                    <b-list-group v-if="rows" class="text-center text-dark" id="result">                                            
+                        <b-list-group-item>
+                            <b-table-simple hover small caption-top responsive>
+                                <b-thead class="text-center text-dark">
+                                    <b-tr>
+                                        <b-th colspan="6" class="text-center text-light" variant="dark">{{ domains[currentPage].url }}</b-th>        
+                                    </b-tr>
+                                    <b-tr>
+                                        <b-th>Servers Changed</b-th>
+                                        <b-th>SSL Grade</b-th>
+                                        <b-th>Previous SSL</b-th>
+                                        <b-th>Logo</b-th>
+                                        <b-th>Title</b-th>
+                                        <b-th>Is Down</b-th>                                    
+                                    </b-tr>
+                                </b-thead>
+                                <b-tbody class="text-center text-dark">
+                                    <b-tr>
+                                        <b-td>{{ domains[currentPage].info.changed }}</b-td>
+                                        <b-td>{{ domains[currentPage].info.ssl_grade }}</b-td>
+                                        <b-td>{{ domains[currentPage].info.previous }}</b-td>
+                                        <b-td>{{ domains[currentPage].info.logo }}</b-td>
+                                        <b-td>{{ domains[currentPage].info.title }}</b-td>
+                                        <b-td>{{ domains[currentPage].info.down }}</b-td>                                
+                                    </b-tr>
+                                </b-tbody>
+                            </b-table-simple>    
+                        </b-list-group-item> 
+
+                        <b-list-group-item>
+                            <b-table-simple hover small caption-top responsive>
+                                <b-thead class="text-center text-dark">
+                                    <b-tr>
+                                        <b-th colspan="6" variant="info">
+                                            Servers
+                                        </b-th>        
+                                    </b-tr>
+                                    <b-tr>
+                                        <b-th>Address</b-th>
+                                        <b-th>SSL Grade</b-th>
+                                        <b-th>Country</b-th>
+                                        <b-th>Owner</b-th>                                   
+                                    </b-tr>
+                                </b-thead>
+                                <b-tbody class="text-center text-dark" v-for="ss in domains[currentPage].info.servers" :key="ss">
+                                    <b-tr>
+                                        <b-td>{{ ss.address }}</b-td>
+                                        <b-td>{{ ss.ssl_grade }}</b-td>
+                                        <b-td>{{ ss.country }}</b-td>
+                                        <b-td>{{ ss.owner }}</b-td>                                                              
+                                    </b-tr>
+                                </b-tbody>
+                            </b-table-simple>
+                        </b-list-group-item>
+                    </b-list-group> 
+                    <!-- <div class="mt-3" v-for="d in domains" :key="d.url">
+                        <div>                                                                                                                                          
                             <b-table-simple hover small caption-top responsive>
                                 <b-thead class="text-center text-dark">
                                     <b-tr>
@@ -74,10 +129,21 @@
                                         <b-td>{{ ss.owner }}</b-td>                                                              
                                     </b-tr>
                                 </b-tbody>
-                            </b-table-simple>                                                                                                                                                          
+                            </b-table-simple>                             
+
                         </div>                                                                                                                              
-                    </div>                                                                                                                                                                                                                                                               
-                </b-container>                                     
+                    </div> -->   
+                    <b-pagination
+                        v-if="rows"
+                        v-model="currentPage"
+                        :total-rows="rows" 
+                        :per-page="perPage"                   
+                        aria-controls="result"
+                        align="center"                        
+                    ></b-pagination>                                                                                                                                                                                                                                                           
+                </b-container> 
+                
+                                   
             </b-card-text>
 
         </b-card>                            
@@ -97,7 +163,8 @@
         data() {
             return {
                 currentPage: 1,
-                rows: 0,                               
+                rows: 0, 
+                perPage: 1,                             
                 errors: [],
                 error: false,
             }

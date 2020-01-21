@@ -124,8 +124,7 @@ func (d *Domain) getDomains() []Domain {
 	domain := Domain{}
 	domains := []Domain{}	
 
-	rows, err := db.Query(`SELECT id, url, servers_changed, ssl_grade, previous_ssl, logo, title, is_down 
-		FROM domains ORDER BY created DESC`)
+	rows, err := db.Query(`SELECT id, url, servers_changed, ssl_grade, previous_ssl, logo, title, is_down FROM domains ORDER BY created DESC`)
     if err != nil {
 		return domains
 	}
