@@ -152,7 +152,7 @@
         name: 'History', 
         data() {
             return {
-                currentPage: 0,
+                currentPage: 1,
                 rows: 0, 
                 perPage: 1,                             
                 errors: [],                
