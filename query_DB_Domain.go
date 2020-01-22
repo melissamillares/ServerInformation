@@ -10,22 +10,15 @@ func existsDomain(url string) bool {
 	var resp bool
 	var id, title string
 
-	rows := db.QueryRow(`SELECT id, title FROM domains WHERE url = $1`, url).Scan(&id, &title)
-	//defer rows.Close()
+	row := db.QueryRow(`SELECT id, title FROM domains WHERE url = $1`, url).Scan(&id, &title)	
 
-	/* if rows != nil {
-		resp = true
-	} else {
-		resp = false
-	} */
-	if rows == sql.ErrNoRows {
+	if row == sql.ErrNoRows {
 		resp = false
 	} else {
 		resp = true
 	}
 
 	defer db.Close()
-
 	return resp
 }
 
