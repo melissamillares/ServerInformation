@@ -72,7 +72,7 @@ func (d *Domain) getDomainSSL(host string) string {
 	defer rows.Close()
 
 	for rows.Next() {    
-        rows.Scan(&d.ID)        
+        rows.Scan(&d.SSL)        
 		ssl = d.SSL
 	}
 	defer db.Close()
