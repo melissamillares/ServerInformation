@@ -11,7 +11,7 @@ func routes() http.Handler {
 	r := chi.NewRouter()
 
 	r.Route("/domain", func(r chi.Router) { // first endpoint
-		r.Get("/", listDomainServers)  // GET    BUSCAR POR ID???
+		//r.Get("/", listDomainServers)  // GET  
 		r.Post("/", addDomain) // POST 
 	})
 	r.Route("/getalldomains", func(r chi.Router) { // second endpoint
@@ -49,8 +49,7 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 		pssl := domain.getDomainSSL(u) // obtain the previous ssl grade from the last domain saved
 		// check if it exists before inserting in database
 		exists := existsDomain(hostName(url))
-		if exists == true {	
-			//var servs []Server
+		if exists == true {				
 			servers = getUpdatedServers(url)
 			domain = getUpdatedDomain(url, servers)		
 			domain.updateDomain()		
@@ -59,15 +58,22 @@ func addDomain(w http.ResponseWriter, r *http.Request) {
 			for i, server := range servers {
 				lasts := servs[i].serversSameDomain()	
 
-				if compareOneHourAgo(server, lasts[i]){
-					equal = equalServers(lasts[i], server)
-					if equal == false {								
-						domain.Servers_Changed = true					
-						domain.updateServersChangedDomain()
+				if (len(lasts) == len(servers)) {
+					if compareOneHourAgo(server, lasts[i]) {
+						equal = equalServers(lasts[i], server)
+						if equal == false {								
+							domain.Servers_Changed = true					
+							domain.updateServersChangedDomain()
+						}
+						domain.Previous_SSL = pssl
+						domain.updateServersPrevious()
 					}
+				} else {
+					domain.Servers_Changed = true					
+					domain.updateServersChangedDomain()
 					domain.Previous_SSL = pssl
 					domain.updateServersPrevious()
-				}
+				}				
 
 				server.DomainID = dID
 				server.updateServer(dID)																 
