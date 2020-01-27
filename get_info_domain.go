@@ -10,7 +10,6 @@ import (
 )
 
 // ssl: array with the SSL grade from the servers
-// returns 
 func getLowerGrade(ssl []string) string {
 	sort.Strings(ssl) // sorts the array in increasing order
 	
@@ -31,17 +30,6 @@ func getLowerGrade(ssl []string) string {
 	} 
 
 	return ssl[last_index]
-}
-
-func getPreviousSSL(r string) string {
-	var lowerSSL string
-
-	host := hostName(r)
-	IPs := getIP(host) // array with the server IPs							
-	ssl := getSSLGrade(host, len(IPs)) // SSL grade				
-	lowerSSL = getLowerGrade(ssl) // lower SSL grade
-
-	return lowerSSL
 }
 
 func getLogo(urlString string) string {	

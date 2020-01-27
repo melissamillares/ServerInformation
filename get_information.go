@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"	
+	"fmt"
+	"time"	
 	"log"	
 	"net"		
 	"net/url"
@@ -111,18 +112,20 @@ func isServerDown(urlString string) bool {
 
 func compareOneHourAgo(serv1, serv2 Server) bool {
 	resp := false
-	//var server Server
-	//for _, serv := range servers {		
-		y1, m1, d1 := serv1.Created.Date()
-		serv1Date := string(y1) + string(m1) + string(d1)
-		y2, m2, d2 := serv2.Created.Date()
-		serv2Date := string(y2) + string(m2) + string(d2)
+			
+	y1, m1, d1 := serv1.Created.Date()
+	serv1Date := string(y1) + string(m1) + string(d1)
+	y2, m2, d2 := serv2.Created.Date()
+	serv2Date := string(y2) + string(m2) + string(d2)
 
-		if serv2.Created.Hour() - serv1.Created.Hour() >= 1 || serv1Date != serv2Date || serv2.Updated.Hour() - serv1.Updated.Hour() >= 1 {
-			// if the difference in update is more than 1 hour			
-			resp = true								
-		} 
-	//}
+	if serv2.Created.Hour() - serv1.Created.Hour() >= 1 || serv1Date != serv2Date {
+		// if the difference in update is more than 1 hour			
+		resp = true								
+	} else if (serv1.Updated != time.Time{}) && (serv2.Updated != time.Time{}) { // if the updated time is different from null time
+		if serv2.Updated.Hour() - serv1.Updated.Hour() >= 1 {
+			resp = true
+		}
+	}
 	return resp
 }
 

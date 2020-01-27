@@ -2,30 +2,23 @@ package main
 
 import (		
 	_ "github.com/lib/pq"
+	"database/sql"
 )
 
-func (s *Server) serversSameDomain() []Server {
+func (s *Server) existsServer() bool {
 	db := connDB()
-	//var server Server
-	var servers []Server
+	var resp bool	
 
-	rows, _ := db.Query(`SELECT address, ssl_grade, country, owner, created, updated FROM servers WHERE domain = $1`, s.Domain)	
-	defer rows.Close()
+	row := db.QueryRow(`SELECT id, address FROM servers WHERE address = $1`, s.Address).Scan(&s.ID, &s.Address)	
 
-	for rows.Next() {    
-		rows.Scan(&s.Address, &s.SSL_grade, &s.Country, &s.Owner, &s.Created, &s.Updated)
-		servers = append(servers, Server{
-				Address: s.Address, 
-				SSL_grade: s.SSL_grade,
-				Country: s.Country,
-				Owner: s.Owner,
-				Created: s.Created,
-				Updated: s.Updated,
-		})		
+	if row == sql.ErrNoRows {
+		resp = false
+	} else {
+		resp = true
 	}	
-	defer db.Close()
 
-	return servers
+	defer db.Close()
+	return resp
 }
 
 func (s *Server) updateServer(domainID int) {

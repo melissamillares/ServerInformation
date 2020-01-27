@@ -83,7 +83,7 @@ func (d *Domain) getDomain() Domain {
 	db := connDB()
 	serv := Server{}
 	domain := Domain{}
-	var s []Server
+	s := []Server{}
 
 	rows, _ := db.Query(`SELECT id, url, servers_changed, ssl_grade, previous_ssl, logo, title, is_down FROM domains`)	    	
 	defer rows.Close()
