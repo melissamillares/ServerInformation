@@ -21,7 +21,7 @@
             <b-card-text>
                 <b-container fluid border-variant="secondary">                                                                                                                 
                     <b-list-group v-if="rows" class="text-center text-dark" id="result">                                            
-                        <b-list-group-item>
+                        <b-list-group-item>                            
                             <b-table-simple hover small caption-top responsive>
                                 <b-thead class="text-center text-dark">
                                     <b-tr>
@@ -38,12 +38,12 @@
                                 </b-thead>
                                 <b-tbody class="text-center text-dark">
                                     <b-tr>
-                                        <b-td>{{ domains[currentPage].info.changed }}</b-td>
+                                        <b-td>{{ domains[currentPage].info.servers_changed }}</b-td>
                                         <b-td>{{ domains[currentPage].info.ssl_grade }}</b-td>
-                                        <b-td>{{ domains[currentPage].info.previous }}</b-td>
+                                        <b-td>{{ domains[currentPage].info.previous_ssl_grade }}</b-td>
                                         <b-td>{{ domains[currentPage].info.logo }}</b-td>
                                         <b-td>{{ domains[currentPage].info.title }}</b-td>
-                                        <b-td>{{ domains[currentPage].info.down }}</b-td>                                
+                                        <b-td>{{ domains[currentPage].info.is_down }}</b-td>                                
                                     </b-tr>
                                 </b-tbody>
                             </b-table-simple>    
